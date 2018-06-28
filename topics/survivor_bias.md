@@ -1,0 +1,37 @@
+# Survivor bias
+
+When a new feature for a programming language is proposed to make a concepts
+easier to learn by beginners, I often read comments like
+"_It is not needed as I learned X perfectly well without this feature_"
+or "_I teach X as is and my students do not need this feature to learn programming._"
+
+I see this as a typical example of
+[survivor bias](https://en.wikipedia.org/wiki/Survivorship_bias).
+
+I'm reminded of a (teaching award ceremony I attended in 2008)[http://www.atlanticuniversities.ca/sites/default/files/documents/AAUTeachingAwards/AAUDistinguishedTeachingCitations/2008%20VanBommel%20Citation.pdf] where, during the introduction
+of one of the recipients, it was mentioned:
+
+
+> _While he teaches at
+> all levels, Martin is particularly associated with the first year programming class,
+> a course he has taught for ten years._
+
+The computer language taught to beginners by
+[Dr. Martin van Bommel](http://people.stfx.ca/mvanbomm/) was
+[C++](http://people.stfx.ca/mvanbomm/cs161/).
+
+Having listened to Dr. van Bommel presentation and talked to him afterwards,
+I have no doubt that he was very much deserving of the teaching award he received;
+having met him only once and remembering his presentation 10 years later is
+a clear sign that he made quite a positive impression.
+Yet, in spite of Dr. van Bommel's opinion expressed to me at the time,
+I am not convinced at all that C++ is objectively a better language than Python
+(or Racket, Scratch, etc.) to teach computer programming concepts to beginners;
+in fact, I am convinced that the opposite is true.
+
+Still, while I think that Python is an excellent choice for teaching
+programming to beginners, I believe that it could be improved for that purpose.
+I also believe that many potential improvements do not need to be part of
+the core language, but only available as temporary aids during the
+learning process. While I learned perfectly well using standard Python,
+it does not mean that my learning experience could not have been improved upon.
