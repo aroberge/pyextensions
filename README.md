@@ -1,4 +1,4 @@
-# pymodlang
+# pyextensions
 
 In October 2015, I wrote a
 [first blog post](https://aroberge.blogspot.com/2015/10/from-experimental-import-somethingnew.html)
