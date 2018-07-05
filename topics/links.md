@@ -2,7 +2,9 @@
 
 Luciano's support for repeat https://mail.python.org/pipermail/python-ideas/2015-October/036843.html
 
-Terry's mention of dialects https://mail.python.org/pipermail/python-ideas/2015-October/036834.html
+https://mail.python.org/pipermail/python-ideas/2015-October/036834.html
+
+- adding hooks to IDLE for Python dialects
 
 Very first mention of `__experimental__` https://mail.python.org/pipermail/python-list/2001-March/105776.html
 
@@ -34,78 +36,107 @@ Apr 24, 2017 https://aroberge.blogspot.com/2017/04/easily-modifiable-python.html
 
 https://mail.python.org/pipermail/python-ideas/2007-September/000968.html
 
-https://mail.python.org/pipermail/python-ideas/2008-June/001687.html
+- `skip` instead of `continue`
+- `loop` on its own
+- `loop while` and `loop for`
+- `breakif` and `skipif`
 
-https://mail.python.org/pipermail/python-ideas/2008-September/002083.html
+Note that `loop` was criticised by someone else as using computer jargon,
+which is ironic given that the suggestion to use `skip` was to avoid
+using `continue` given its different meaning in computer jargon.
 
-https://mail.python.org/pipermail/python-ideas/2009-January/002466.html
-
-https://mail.python.org/pipermail/python-ideas/2009-April/003897.html
 
 translation of keywords:
 https://mail.python.org/pipermail/python-ideas/2009-April/004179.html
 
-https://mail.python.org/pipermail/python-ideas/2009-May/004422.html
 
-https://mail.python.org/pipermail/python-ideas/2009-August/005436.html
-
+translating tracebacks:
 https://mail.python.org/pipermail/python-ideas/2010-May/007211.html
   important comment https://mail.python.org/pipermail/python-ideas/2010-May/007213.html
 
+
+Completely localized version of Python:
 https://mail.python.org/pipermail/python-ideas/2010-November/008826.html
+
+- Follow up starting at https://mail.python.org/pipermail/python-ideas/2010-December/008831.html
+
 
 https://mail.python.org/pipermail/python-ideas/2011-April/009765.html
 
+- AST transformation hooks for domain specific languages
 more at https://mail.python.org/pipermail/python-ideas/2011-April/009803.html
 
 
 https://mail.python.org/pipermail/python-ideas/2012-August/015987.html
 
+- verbose traceback formatting. The subsequent discussion mentions https://docs.python.org/3.7/library/cgitb.html.
+
 
 https://mail.python.org/pipermail/python-ideas/2012-October/016275.html
 
- :-) https://mail.python.org/pipermail/python-ideas/2012-October/016293.html
-
-https://mail.python.org/pipermail/python-ideas/2012-October/016865.html
-
-
+- Guido's explanation about why allowing unicode identifiers is a good idea (but not for Python keywords)
 
 https://mail.python.org/pipermail/python-ideas/2013-March/019727.html
 
-https://mail.python.org/pipermail/python-ideas/2014-April/027499.html
+- about having an `__experimental__` package
 
-https://mail.python.org/pipermail/python-ideas/2015-March/032745.html
 
-https://mail.python.org/pipermail/python-ideas/2015-March/032817.html see note about pytest
+https://mail.python.org/pipermail/python-ideas/2015-March/032817.html
 
-https://mail.python.org/pipermail/python-ideas/2015-May/033621.html
+- Py.test goes through the trouble
+of parsing the python test_.py files in order to generate nicer error
+messages.
+
+https://mail.python.org/pipermail/python-ideas/2015-May/033623.html
+
+- Andrew Barnett about using import hooks
+
 
 https://mail.python.org/pipermail/python-ideas/2015-May/033638.html
 
-I think that the majority of Python programmers have no idea that you
-can even write an import hook at all, let alone how to do it. in
+- explains how to use importlib to access the AST
+
 https://mail.python.org/pipermail/python-ideas/2015-May/033633.html
 
-"teachpacks" https://mail.python.org/pipermail/python-ideas/2015-May/033661.html
+- _I think that the majority of Python programmers have no idea that you
+can even write an import hook at all, let alone how to do it._
+
+https://mail.python.org/pipermail/python-ideas/2015-May/033661.html
+
+- idea of "teachpacks", somewhat similar to Scheme
 
 https://mail.python.org/pipermail/python-ideas/2015-June/033953.html
 
-https://mail.python.org/pipermail/python-ideas/2015-June/033980.html
+- adding a hook between lexer and parser
 
-https://mail.python.org/pipermail/python-ideas/2015-June/034023.html
+
 
 https://mail.python.org/pipermail/python-ideas/2015-June/034055.html
 
-https://mail.python.org/pipermail/python-ideas/2015-June/033979.html
+- `source_to_code` hook added ...
+- mentions of Macropy, hylang, Numba
+- See http://stupidpythonideas.blogspot.com/2015/06/hacking-python-without-hacking-python.html
 
-http://stupidpythonideas.blogspot.com/2015/06/hacking-python-without-hacking-python.html
-
-Important: https://mail.python.org/pipermail/python-ideas/2015-June/034007.html
 
 https://mail.python.org/pipermail/python-ideas/2015-September/035672.html
+
+- adding non English names in the turtle module
 
 https://stackoverflow.blog/2014/02/13/cant-we-all-be-reasonable-and-speak-english/
 
 https://mail.python.org/pipermail/python-ideas/2016-December/043910.html
 
+- better error messages
+
 https://mail.python.org/pipermail/python-ideas/2017-March/045344.html
+
+- `repeat_for n:`
+
+https://mail.python.org/pipermail/python-ideas/2015-May/033570.html
+
+- `unless` as synonym for `if not`
+
+
+## other
+
+tail call optimization https://eli.thegreenplace.net/2017/on-recursion-continuations-and-trampolines/

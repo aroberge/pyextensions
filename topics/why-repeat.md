@@ -1,6 +1,6 @@
 # Why `repeat`?
 
-In Reeborg's World, I added a non-standard syntactic construction to Python with an additional keyword: `repeat`. This allows a student to write
+In Reeborg's World, I added a non-standard syntactic construction to Python with an additional keyword: `repeat`. [Note to self: this was done on Oct. 10, 2015.] This allows a student to write
 
 ```py
 # draw square
