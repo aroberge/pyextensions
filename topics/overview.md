@@ -4,10 +4,9 @@ This is just an outline of possible topics (with links to files
 that may or may not exist yet.)
 
 - [Loops](loops.md)
+- [Simpler loops](loops2.md)
 - [Teaching concept vs idioms](idiomatic.md)
 - [Racket languages](racket.md)
-- [Brief overview of Scratch](scratch.md)
-- [Brief overview of Blockly](blockly.md)
 - [Note about Scratch 3.0 and Blockly](scratch3.md)
 - [Translation of computer language](i18n.md)
 - [Import hooks: how to transform the source](hook_source.md)
@@ -18,3 +17,6 @@ that may or may not exist yet.)
 - [Editors used in teaching environments](editors.md)
 - [Do a review of CP4E](cp4e.md) https://www.python.org/doc/essays/cp4e/
 - [Survivor bias: an anecdote](survivor_bias.md)
+- [Beyond textual docstrings](docpicture.md)
+- [Exit strategy: Transition to standard Python](transition.md)
+- [More helpful error messages](tracebacks.md)

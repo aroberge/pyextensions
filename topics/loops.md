@@ -14,8 +14,8 @@ of instructions to repeat, the four basic loops categories are:
 In what follows, I will refer to these categories simply as
 
 1. repeat n
-2. repeat while
-3. repeat until
+2. repeat while condition
+3. repeat until condition
 4. repeat forever
 
 I note that, for experienced programmers, the last two categories are usually
@@ -32,7 +32,7 @@ Scratch control blocks includes only 3 of the four categories:
 
 ![](/images/scratch_repeat_n.png)
 
-3. repeat until
+3. repeat until condition
 
 ![](/images/scratch_repeat_until.png)
 
@@ -46,9 +46,11 @@ does include the translation of _repeat_ for all 3 types of loops
 including the infinite one.
 
 ![](/images/scratch_repeat_forever_fr.png)
+![](/images/scratch_repeat_n_fr.png)
+![](/images/scratch_repeat_until_fr.png)
 
-To a Python programmer, it may come as a surprise that the `repeat until` is
-included but not `repeat while`. Given the work that went into designing Scratch,
+To a Python programmer, it may come as a surprise that the `repeat until condition` is
+included but not `repeat while condition`. Given the work that went into designing Scratch,
 there is likely a fair bit of research that
 lead to choosing this variant as the easiest and most natural
 one to understand by beginners.
@@ -71,15 +73,15 @@ not the same as Scratch.
 
 ![](/images/blockly_repeat_n.png)
 
-2. repeat while
+2. repeat while condition
 
 ![](/images/blockly_repeat_while.png)
 
-3. repeat until
+3. repeat until condition
 
 ![](/images/blockly_repeat_until.png)
 
-`repeat while` and `repeat until` are variants of a single block
+`repeat while condition` and `repeat until condition` are variants of a single block
 
 ![](/images/blockly_repeat_while_until.png)
 
@@ -94,8 +96,9 @@ from [Reeborg's World](http://reeborg.ca/reeborg.html).
 
 ![](/images/blockly_example2_python.png)
 
-Note that the color scheme used for individual blocks is different in Reeborg's World
-as compared with that used in Blockly.
+(The color scheme used for individual blocks is different in Reeborg's World
+as compared with that used in Blockly; standard Blockly blocks for loops are
+green whereas they are blue for Reeborg's World.)
 
 
 ![](/images/blockly_example_python.png)
@@ -126,7 +129,110 @@ the number of elements in a container
 
 ## Python loops
 
-Add text
+Python programmers think of loops as coming in two flavours:
+`for` loop and `while` loops.  Let's see how the four categories we
+have identified are written in Python.
+
+We start with the second case, `repeat while condition`.  It is written as
+
+```py
+while condition:
+    # block of code
+```
+
+which is essentially the simplest syntax one can imagine. The third case,
+`repeat until condition`, is derived from the second using boolean logic
+
+```py
+while not condition:
+    # block of code
+```
+
+Mentally translating `while not condition` into `until condition` is something
+that experienced programmers do effortlessly, but which requires a conscious
+effort for beginners.
+
+The `repeat forever` case is usually written with the following Python idiom
+
+```py
+while True:
+    # block of code
+```
+
+This is something that is normally learned rather than quickly and
+intuitively deduced. Before `True` became a keyword, it used to be written as
+
+```py
+while 1:
+    # block of code
+```
+which required even one more step of mental gymnastics before being understood.
+Of course, once one has learned the idiom, it is trivially recognized.
+
+This leaves us with what we labeled as the first category, `repeat n`.
+Before showing the normal Python syntax for this case, it might be useful
+to consider a more general case.
+
+Often one will write a program where a given series of instructions will
+be applied to a collection.  Here are some examples of how this is done
+with Python:
+
+```py
+# iterating over a list
+for item in [1, 2, 3]:
+    print(item)    # or do something else with the item ...
+
+# iterating over a string:
+for letter in "Python":
+    print(letter)
+
+# iterating over the keys of a dict
+for key in {'a': 1, 'b': 2, 'c': 3}:
+    print(key)
+
+# iterating over a tuple
+for item in (1, 2, 3):
+    print(item)
+
+# iterating over a set:
+for element in {1, 2, 3}:
+    print(element)
+
+# iterating over a file; note that this is not the recommended way
+for line in open('test.txt'):
+    print(line)
+```
+
+The general pattern is
+
+```py
+for item in some_iterable:
+    do_something(item)   # this can be an arbitrary code block
+```
+
+It is a powerful pattern which is definitely one of Python's strengths.
+It also needs to be understood before introducing the very useful
+list comprehensions and generator expressions in Python.
+
+In the absence of a collection that has a set number of items
+Python introduces a special built-in iterable, `range()`,
+which is then used in the generic for loop construct.
+
+```py
+for some_variable in range(n):
+    # block of code
+```
+
+For experienced programmers, reusing such a powerful and relatively
+simple pattern for iterations is great.
+However, I would argue that it is less than ideal for beginners, and certainly
+not as intuitive as the textual descriptions of the blocks used in Scratch
+or Blockly, which would translate in a Python-like language as
+
+```py
+repeat n:
+    # block of code
+```
 
 ## Digging through the archives
 
