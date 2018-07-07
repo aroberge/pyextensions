@@ -55,6 +55,7 @@ while condition:
 ```
 
 If you know French and what a Python `while` loop is, the answer is obvious.
+If you don't know French, you likely have a 50% chance of being wrong.
 
 ## The English version of the four loops
 
@@ -83,7 +84,6 @@ while condition:
 ```
 This is the same question as before, but this time the answer is completely obvious to someone who knows what a Python `while` loop is.
 
-
 ## Python's version
 
 ```py
@@ -100,15 +100,15 @@ while condition:
     # block
 ```
 
-For someone who is seeing the concept of loops for the very first time, the translation of any one of these Python idioms (without seeing the other three) into the corresponding English version is likely not intuitively obvious.
+For someone who is seeing the concept of loops for the very first time, the translation of any one of these four Python idioms (without seeing the other three) into the corresponding English version is likely not intuitively obvious.
 
 ## Conclusion
 
-Python is often described as executable pseudocode. Once people have learned a few idiomatic expressions, like `for variable in range(n)`, translating pseudocode written in English into Python is fairly straightforward.
+Python is often described as executable pseudocode. Once people have learned a few idiomatic expressions, like `for variable in range(n)`, translating pseudocode written in English into Python is usually very straightforward.
 
 If the pseudocode is not written in English, the translation process is, at least initially, not as straightforward as an additional mental step is required by the translation from the original language into Python's English. The small number of keyword in Python is a definite help in this process.
 
-For absolute beginners who are learning programming concepts (control flow structures, defining functions, etc.), being able to use a language that uses keywords easily understood in their own language can certainly facilitate the learning process.
+For absolute beginners who are learning programming concepts (control flow structures, defining functions, etc.), being able to use a language that uses keywords easily understood in their own language can definitely facilitate the learning process.
 
 
 
