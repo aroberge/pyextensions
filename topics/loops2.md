@@ -48,20 +48,24 @@ répéter pendant_que condition:
     # block
 ```
 
-### A quiz
-
-Which of the above correspond to Python's
+**A quiz**: which of the above correspond to Python's
 ```py
 while condition:
     # block
 ```
 
-If you know French, the answer is obvious.
+If you know French and what a Python `while` loop is, the answer is obvious.
 
 ## The English version of the four loops
 
+The four versions above can be written (in a different order) as follows
+in English:
+
 ```py
 repeat n:
+    # block
+
+repeat while condition:
     # block
 
 repeat forever:
@@ -69,10 +73,16 @@ repeat forever:
 
 repeat until condition:
     # block
+```
 
-repeat while condition:
+**A quiz**: which of the above correspond to Python's
+
+```py
+while condition:
     # block
 ```
+This is the same question as before, but this time the answer is completely obvious to someone who knows what a Python `while` loop is.
+
 
 ## Python's version
 
@@ -89,6 +99,8 @@ while not condition:
 while condition:
     # block
 ```
+
+For someone who is seeing the concept of loops for the very first time, the translation of any one of these Python idioms (without seeing the other three) into the corresponding English version is likely not intuitively obvious.
 
 ## Conclusion
 
