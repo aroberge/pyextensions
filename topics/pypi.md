@@ -63,6 +63,11 @@ be written by people that are experts in using `importlib`. Having it
 in the standard library would ensure that it could be relied upon when a new
 version of Python is made available.
 
+NOte: from https://devguide.python.org/stdlibchanges/#acceptable-types-of-modules
+
+> _Typically two types of modules get added to the stdlib. One type is a module which implements something that is difficult to get right._
+
+
 It would also ensure that its API is documented and, with the adoption of
 [PEP 545](https://www.python.org/dev/peps/pep-0545/), made available in
 many languages - keeping in line with one of the motivation for the proposed

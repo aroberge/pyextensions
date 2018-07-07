@@ -20,3 +20,22 @@ that may or may not exist yet.)
 - [Beyond textual docstrings](docpicture.md)
 - [Exit strategy: Transition to standard Python](transition.md)
 - [More helpful error messages](tracebacks.md)
+
+
+
+api:
+
+1)
+
+python -m dialect  vs  python -Z dialect
+
+2)
+
+# dialect some_name
+
+vs
+
+from __dialect__ import some_name
+
+
+3) using .py extension or creating a new one .pyz
