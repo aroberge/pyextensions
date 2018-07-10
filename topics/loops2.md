@@ -1,4 +1,4 @@
-# Simpler loops: an example
+# Simpler loops?
 
 ## Context
 
@@ -82,7 +82,7 @@ repeat until condition:
 while condition:
     # block
 ```
-This is the same question as before, but this time the answer is completely obvious to someone who knows what a Python `while` loop is.
+This is the same question as before, but this time the answer should be completely obvious to someone who knows what a Python `while` loop is.
 
 ## Python's version
 
@@ -102,13 +102,12 @@ while condition:
 
 For someone who is seeing the concept of loops for the very first time, the translation of any one of these four Python idioms (without seeing the other three) into the corresponding English version is likely not intuitively obvious.
 
-## Conclusion
+## Observations
 
 Python is often described as executable pseudocode. Once people have learned a few idiomatic expressions, like `for variable in range(n)`, translating pseudocode written in English into Python is usually very straightforward.
 
 If the pseudocode is not written in English, the translation process is, at least initially, not as straightforward as an additional mental step is required by the translation from the original language into Python's English. The small number of keyword in Python is a definite help in this process.
 
 For absolute beginners who are learning programming concepts (control flow structures, defining functions, etc.), being able to use a language that uses keywords easily understood in their own language can definitely facilitate the learning process.
-
-
-
+This is the approach taken by people using block-based environment
+(Scratch, Blockly, etc.) to help students learn programming concepts.

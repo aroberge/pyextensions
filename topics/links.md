@@ -1,3 +1,5 @@
+# Various links of potential interest
+
 `__experimental__` mentioned: https://mail.python.org/pipermail/python-ideas/2011-August/011279.html
 
 Luciano's support for repeat https://mail.python.org/pipermail/python-ideas/2015-October/036843.html
@@ -20,9 +22,20 @@ https://github.com/samrushing/cps-python/
 
 Rejected PEP (by its author): https://www.python.org/dev/peps/pep-0511/
 
+Need to read https://mail.python.org/pipermail/python-ideas/2016-January/037892.html
+
 ## Blog posts
 
 October 14, 1995 https://aroberge.blogspot.com/2015/10/from-experimental-import-somethingnew.html
+
+I wrote the following:
+> I'm not ready yet to bring another suggestion to the python-ideas list ... However ...
+>
+> Python support the special `from __future__ import ...` construct to determine how it will interpret the rest of the code in that file.  I think it would be useful if a similar kind of statement "from __experimental import ..." would also benefit from the same kind of special treatment so that it
+would work in all instances, and not only when a module is imported.   People could then share (and install via pip) special code importers and know that they would work in all situations, and not limited to special environments like Reeborg's World, or IDLE as suggested by T.J. Reddy and likely others.
+
+However, a concrete suggestions along these lines will have to wait for another day...
+
 
 Octobre 14, 1995 - second post https://aroberge.blogspot.com/2015/10/from-experimental-import-somethingnew_14.html
 
@@ -32,7 +45,7 @@ Dec 1, 2015 https://aroberge.blogspot.com/2015/12/french-python.html
 
 Apr 24, 2017 https://aroberge.blogspot.com/2017/04/easily-modifiable-python.html
 
-# From Python-ideas
+## From Python-ideas
 
 https://mail.python.org/pipermail/python-ideas/2007-September/000968.html
 
@@ -135,7 +148,6 @@ https://mail.python.org/pipermail/python-ideas/2017-March/045344.html
 https://mail.python.org/pipermail/python-ideas/2015-May/033570.html
 
 - `unless` as synonym for `if not`
-
 
 ## other
 

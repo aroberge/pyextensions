@@ -1,5 +1,14 @@
 # Survivor bias: an anecdote
 
+> _Programming languages to never teach to beginners_
+>
+> _C++ - It's just beastly and horrendously ugly - confuses students like heck (huh? copy constructors? virtual destructors?). Java is far cleaner and can teach the same object-oriented programming and software engineering concepts. Java even has generics now, so no more arguing that C++ has templates. For teaching low-level systems programming, C is much more straightforward to deal with._
+>
+> **Source**: [Philip Guo's Introductory Computer Programming Education](http://pgbovine.net/prog-curriculum.htm) where he recommends Python as
+the first language to learn.
+
+
+
 When a new feature for a programming language is proposed to make a concepts
 easier to learn by beginners, I often read comments like
 "_It is not needed as I learned X perfectly well without this feature_"

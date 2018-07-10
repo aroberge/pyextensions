@@ -234,6 +234,119 @@ repeat n:
     # block of code
 ```
 
+### A digression: Ruby's loops
+
+Python's philosophy is described in the _Zen of Python_, written ty Tim Peters.
+Loops in Python definitely conform to the idea that
+
+> _There should be one-- and preferably only one --obvious way to do it._
+
+Meanwhile, Ruby's philosophy, though not codified, appears to be that
+a programmer should be given as many ways as possible to express a given
+construct.
+
+For example, unlike Python, Ruby has both a `while` loop
+
+```rb
+while condition do
+   # code
+end
+```
+
+and an `until` loop
+
+```rb
+until condition do
+   # code
+end
+```
+
+Using `begin` instead of `do`, the test can be also put at the end of a loop,
+ensuring that at least one iteration is done
+
+```rb
+begin
+  # code
+end until condition
+```
+
+```rb
+begin
+  # code
+end while condition
+```
+
+Repeating instructions a fixed number of times, without needed
+a variable to label each repetition, can be easily achieved, as in
+
+```rb
+3.times do
+  puts 'Hello'
+end
+```
+
+Beginners encountering such loops for the first time would likely
+grasp much more easily Ruby's syntax than the corresponding Python idiom
+
+```py
+for _ in range(3):
+   print('Hello')
+```
+
+
+If we need to refer to the variable, we can add it this way:
+
+```rb
+3.times do |n|
+  puts n
+end
+```
+
+This can also be written as
+
+```rb
+for n in 0..2 do
+  puts n
+end
+```
+
+There are yet more ways to write the same loop in Ruby; for example
+
+```rb
+(0..2).each do |i|
+  puts i
+end
+```
+
+or
+
+```rb
+(0..2).each {|i| puts i}
+```
+
+or
+
+```rb
+0.upto(2).each {|i| puts i}
+```
+
+Finally, instead of keyword-defined loops, we can use the `loop` method.
+For example, and infinite loop can be written as
+
+```rb
+loop do
+   # code
+end
+```
+
+
+I believe that Ruby's syntax
+makes it easier for beginners to conceptually understand loops when they
+see them for the first time. However, it is likely more difficult for beginners
+to recognize all the possible ways to achieve a given result using loops,
+and the subtle differences between each of the approaches.
+
+
 ## Digging through the archives
 
 Add text

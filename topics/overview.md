@@ -21,21 +21,12 @@ that may or may not exist yet.)
 - [Exit strategy: Transition to standard Python](transition.md)
 - [More helpful error messages](tracebacks.md)
 
-
-
 api:
 
-1)
+1. `python -m dialect  vs  python -Z dialect`
 
-python -m dialect  vs  python -Z dialect
+2. `# extension some_name` instead of `from __extension__ import some_name`
 
-2)
+3. using .py extension or creating a new one .pyn or .notpy
 
-# dialect some_name
-
-vs
-
-from __dialect__ import some_name
-
-
-3) using .py extension or creating a new one .pyz
+bytecode example: interchange addition and multiplication
