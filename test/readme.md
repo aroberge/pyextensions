@@ -64,6 +64,6 @@ or perhaps more simply:
 
 To run a single test file `X_testfile.py` without using pytest, we simply have to do
 
-    python -m extensions test.X_testfile
+    python -m pyextensions test.X_testfile
 
 also from the parent directory

@@ -1,2 +1,0 @@
-print("inside main")
-pass

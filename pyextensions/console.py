@@ -1,22 +1,25 @@
-#pylint: disable=W0102, C0103
+# pylint: disable=W0102, C0103
 import code
 import platform
 import os
 import sys
 
 from . import transforms
-
 from . import version
 
 # define banner and prompt here so that they can be imported in tests
-banner = "experimental console version {}. [Python version: {}]\n".format(
-            version.__version__, platform.python_version())
-prompt = "~~> "
+banner = "pyextensions console version {}. [Python version: {}]\n".format(
+    version.__version__, platform.python_version()
+)
 
 
-class ExperimentalInteractiveConsole(code.InteractiveConsole):
-    '''A Python console that emulates the normal Python interpreter
-       except that it support experimental code transformations.'''
+class PyextensionsInteractiveConsole(code.InteractiveConsole):
+    """A Python console that emulates the normal Python interpreter
+       except that it support experimental code transformations."""
+
+    def __init__(self, locals=None, show_python=False):
+        self.show_python = show_python
+        super().__init__(locals=locals)
 
     def push(self, line):
         """Transform and push a line to the interpreter.
@@ -32,21 +35,23 @@ class ExperimentalInteractiveConsole(code.InteractiveConsole):
         with in some way (this is the same as runsource()).
 
         """
-        if transforms.FROM_EXPERIMENTAL.match(line):
-            transforms.add_transformers(line)
-            self.buffer.append("\n")
-        else:
-            self.buffer.append(line)
+        self.buffer.append(line)
 
         add_pass = False
-        if line.rstrip(' ').endswith(":"):
+        if line.rstrip(" ").endswith(":"):
             add_pass = True
         source = "\n".join(self.buffer)
         if add_pass:
             source += "pass"
-        source = transforms.transform(source)
+
+        _transformed = False
+        newsource = transforms.transform(source)
+        if newsource != source:
+            _transformed = True
+
+        source = newsource
         if add_pass:
-            source = source.rstrip(' ')
+            source = source.rstrip(" ")
             if source.endswith("pass"):
                 source = source[:-4]
 
@@ -60,13 +65,18 @@ class ExperimentalInteractiveConsole(code.InteractiveConsole):
 
         if not more:
             self.resetbuffer()
+            if self.show_python and _transformed:
+                for line in source.split("\n"):
+                    print("#", line)
         return more
 
 
-def start_console(local_vars={}):
-    '''Starts a console; modified from code.interact'''
-    transforms.CONSOLE_ACTIVE = True
-    transforms.remove_not_allowed_in_console()
-    sys.ps1 = prompt
-    console = ExperimentalInteractiveConsole(locals=local_vars)
+console_defaults = {"import_transformer": transforms.import_transformer}
+
+
+def start_console(local_vars=None, show_python=False):
+    """Starts a console; modified from code.interact"""
+    if local_vars is None:
+        local_vars = console_defaults
+    console = PyextensionsInteractiveConsole(locals=local_vars, show_python=show_python)
     console.interact(banner=banner)

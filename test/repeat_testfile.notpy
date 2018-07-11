@@ -1,4 +1,4 @@
-from __experimental__ import repeat_keyword
+#ext repeat_keyword
 
 def test_repeat():
     i = 1

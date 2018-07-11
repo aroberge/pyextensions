@@ -1,21 +1,20 @@
-#pylint: disable=C0103, W0212
 '''
 In the following explanation, when we mention "the console" we refer to
-a session using the experimental interactive console included in this package.
+a session using the pyextensions interactive console included in this package.
 
 Possible invocations of this module:
 
-1. python -m experimental: we want to start the console
-2. python -m experimental script: we want to run "script" as the main program
+1. python -m pyextensions: we want to start the console
+2. python -m pyextensions script: we want to run "script" as the main program
                                 but do not want to start the console
-3. python -i -m experimental script: we want to run "script" as the main program
+3. python -i -m pyextensions script: we want to run "script" as the main program
                                 and we do want to start the console after
                                 script has ended
-4. python -m experimental trans1 trans2 script: we want to run "script" as the
+4. python -m pyextensions trans1 trans2 script: we want to run "script" as the
                                 main program, after registering the
                                 tansformers "trans1" and "trans2";
                                 we do not want to start the console
-5. python -i -m experimental trans1 trans2 script: same as 4 except that we
+5. python -i -m pyextensions trans1 trans2 script: same as 4 except that we
                                 want to start the console when script ends
 
 Note that a console is started in all cases except 4 above.
