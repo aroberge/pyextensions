@@ -8,4 +8,4 @@ def test_repeat():
 
 if __name__ == "__main__":
     test_repeat()
-    print("Success from examples.repeat_testfile2.pyn")
+    print("Success from examples.repeat2.pyn")

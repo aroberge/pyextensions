@@ -60,7 +60,7 @@ if "-m" in sys.argv:
 
     args = parser.parse_args()
 
-    if args.convert is not None:
+    if args.convert:
         show_python = True
         import_hook.CONVERT = True
     else:
@@ -80,28 +80,8 @@ if "-m" in sys.argv:
                     main_dict[var] = getattr(main_module, var)
                 console.start_console(local_vars=main_dict, show_python=show_python)
         except ModuleNotFoundError:
-            print("Could not find module ", args.source)
+            print("Could not find module ", args.source, "\n")
+            raise
     else:
         console.start_console(local_vars=None, show_python=show_python)
 
-
-# start_console = console.start_console
-# if "-m" in sys.argv:
-
-    
-
-#     if len(sys.argv) > 1:
-#         for i in range(1, len(sys.argv) - 1):
-#             transforms.import_transformer(sys.argv[i])
-
-#         main_module = import_hook.import_main(sys.argv[-1])
-
-#         if sys.flags.interactive:
-#             main_dict = {}
-#             for var in dir(main_module):
-#                 if var in ["__cached__", "__loader__", "__package__", "__spec__"]:
-#                     continue
-#                 main_dict[var] = getattr(main_module, var)
-#             start_console(main_dict)
-#     else:
-#         start_console()

@@ -2,6 +2,7 @@
 code transformers. It also contains a function, `transform`, which
 takes care of invoking all known transformers to convert a source code.
 """
+import ast
 import sys
 
 
@@ -12,8 +13,7 @@ class NullTransformer:
     def transform_source(self, source):
         return source
 
-
-transformers = {}
+TRANSFORMERS = {}
 
 
 def add_transformers(line):
@@ -36,8 +36,8 @@ def import_transformer(name):
        do its job - which is faster and likely more reliable than our
        custom method.
     """
-    if name in transformers:
-        return transformers[name]
+    if name in TRANSFORMERS:
+        return TRANSFORMERS[name]
 
     # We are adding a transformer built from normal/standard Python code.
     # As we are not performing transformations, we temporarily disable
@@ -46,7 +46,7 @@ def import_transformer(name):
     hook = sys.meta_path[0]
     sys.meta_path = sys.meta_path[1:]
     try:
-        transformers[name] = __import__(name)
+        TRANSFORMERS[name] = __import__(name)
         # Some transformers are not allowed in the console.
         # If an attempt is made to activate one of them in the console,
         # we replace it by a transformer that does nothing and print a
@@ -55,7 +55,7 @@ def import_transformer(name):
         sys.stderr.write(
             "Warning: Import Error in add_transformers: %s not found\n" % name
         )
-        transformers[name] = NullTransformer()
+        TRANSFORMERS[name] = NullTransformer()
     except Exception as e:
         sys.stderr.write(
             "\nUnexpected exception in transforms.import_transformer %s\n "
@@ -66,7 +66,7 @@ def import_transformer(name):
     finally:
         sys.meta_path.insert(0, hook)  # restore import hook
 
-    return transformers[name]
+    return TRANSFORMERS[name]
 
 
 def identify_requested_transformers(source):
@@ -82,7 +82,7 @@ def identify_requested_transformers(source):
     return None
 
 
-def transform(source):
+def apply_source_transformations(source):
     """Used to convert the source code, making use of known transformers.
 
        "transformers" are modules which must contain a function
@@ -101,15 +101,16 @@ def transform(source):
     # Some transformer fail when multiple non-Python constructs
     # are present. So, we loop multiple times keeping track of
     # which transformations have been unsuccessfully performed.
-    not_done = transformers
+    not_done = TRANSFORMERS
     while True:
         failed = {}
         for name in not_done:
             tr_module = import_transformer(name)
-            try:
-                source = tr_module.transform_source(source)
-            except Exception as e:
-                failed[name] = tr_module
+            if hasattr(tr_module, 'transform_source'):
+                try:
+                    source = tr_module.transform_source(source)
+                except Exception as e:
+                    failed[name] = tr_module
 
         if not failed:
             break
@@ -124,3 +125,43 @@ def transform(source):
         not_done = failed  # attempt another pass
 
     return source
+
+
+def apply_ast_transformations(source):
+    """Used to convert the source code, making use of known transformers.
+
+       "transformers" are modules which must contain a function
+
+           transform_ast(tree)
+
+       which returns a tranformed ast.
+    """
+    identify_requested_transformers(source)
+    tree = ast.parse(source)
+    # Some transformer fail when multiple non-Python constructs
+    # are present. So, we loop multiple times keeping track of
+    # which transformations have been unsuccessfully performed.
+    not_done = TRANSFORMERS
+    while True:
+        failed = {}
+        for name in not_done:
+            tr_module = import_transformer(name)
+            if hasattr(tr_module, 'transform_ast'):
+                try:
+                    source = tr_module.transform_ast(tree)
+                except Exception as e:
+                    failed[name] = tr_module
+
+        if not failed:
+            break
+
+        # If the exact same set of transformations are not performed
+        # twice in a row, there is no point in trying out again.
+        if failed == not_done:
+            print("Warning: the following source transformations could not be done:")
+            for key in failed:
+                print(key)
+            break
+        not_done = failed  # attempt another pass
+
+    return tree

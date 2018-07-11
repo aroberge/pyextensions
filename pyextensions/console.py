@@ -1,4 +1,5 @@
-# pylint: disable=W0102, C0103
+import ast
+import io
 import code
 import platform
 import os
@@ -6,11 +7,19 @@ import sys
 
 from . import transforms
 from . import version
+from . import unparse
+
+def _unparse(tree):
+    v = io.StringIO()
+    unparse.Unparser(tree, file=v)
+    return v.getvalue()
+
 
 # define banner and prompt here so that they can be imported in tests
 banner = "pyextensions console version {}. [Python version: {}]\n".format(
     version.__version__, platform.python_version()
 )
+prompt ="->> "
 
 
 class PyextensionsInteractiveConsole(code.InteractiveConsole):
@@ -45,7 +54,7 @@ class PyextensionsInteractiveConsole(code.InteractiveConsole):
             source += "pass"
 
         _transformed = False
-        newsource = transforms.transform(source)
+        newsource = transforms.apply_source_transformations(source)
         if newsource != source:
             _transformed = True
 
@@ -58,6 +67,13 @@ class PyextensionsInteractiveConsole(code.InteractiveConsole):
         # some transformations may strip an empty line meant to end a block
         if not self.buffer[-1]:
             source += "\n"
+
+        try:
+            tree = transforms.apply_ast_transformations(source)
+            source = _unparse(tree)
+        except Exception:
+            pass
+
         try:
             more = self.runsource(source, self.filename)
         except SystemExit:
@@ -77,6 +93,9 @@ console_defaults = {"import_transformer": transforms.import_transformer}
 def start_console(local_vars=None, show_python=False):
     """Starts a console; modified from code.interact"""
     if local_vars is None:
-        local_vars = console_defaults
+        local_vars = console_default
+    else:
+        local_vars.update(console_defaults)
+    sys.ps1 = prompt
     console = PyextensionsInteractiveConsole(locals=local_vars, show_python=show_python)
     console.interact(banner=banner)

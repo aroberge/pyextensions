@@ -76,9 +76,6 @@ class ExtensionLoader(Loader):
     def __init__(self, filename):
         self.filename = filename
 
-    def create_module(self, spec):
-        return None  # use default module creation semantics
-
     def exec_module(self, module):
         """import the source code, transforma it before executing it so that
            it is known to Python."""
@@ -94,20 +91,23 @@ class ExtensionLoader(Loader):
             print("############### Original source: ############\n")
             print(source)
 
-        if transforms.transformers:
-            source = transforms.transform(source)
+        if transforms.TRANSFORMERS:
+            source = transforms.apply_source_transformations(source)
         else:
             for line in source.split("\n"):
                 if line.startswith("#ext "):
-                    ## transforms.transform will extract all such relevant
+                    ## transforms.apply_source_transformations will extract all such relevant
                     ## lines and add them all relevant transformers
-                    source = transforms.transform(source)
+                    source = transforms.apply_source_transformations(source)
                     break
         if CONVERT:
             print("\n############### Converted source: ############\n")
             print(source)
             print("="*50, "\n")
-        exec(source, vars(module))
+
+        tree = transforms.apply_ast_transformations(source)
+        co = compile(tree, module.__name__, "exec")
+        exec(co, vars(module))
 
     def get_code(self, _):
         """Hack to silence an error when running pyextensions as main script."""
