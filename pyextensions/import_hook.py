@@ -10,9 +10,11 @@ from importlib.util import spec_from_file_location
 
 from . import transforms
 
-
+# The following global variables can be changed (or used) in __init__.py
+# based on command line options
 MAIN_MODULE_NAME = None
 FILE_EXT = "notpy"
+CONVERT = False
 
 
 def import_main(name):
@@ -88,6 +90,10 @@ class ExtensionLoader(Loader):
         with open(self.filename) as f:
             source = f.read()
 
+        if CONVERT:
+            print("############### Original source: ############\n")
+            print(source)
+
         if transforms.transformers:
             source = transforms.transform(source)
         else:
@@ -97,6 +103,10 @@ class ExtensionLoader(Loader):
                     ## lines and add them all relevant transformers
                     source = transforms.transform(source)
                     break
+        if CONVERT:
+            print("\n############### Converted source: ############\n")
+            print(source)
+            print("="*50, "\n")
         exec(source, vars(module))
 
     def get_code(self, _):

@@ -1,4 +1,4 @@
-'''
+"""
 In the following explanation, when we mention "the console" we refer to
 a session using the pyextensions interactive console included in this package.
 
@@ -18,9 +18,11 @@ Possible invocations of this module:
                                 want to start the console when script ends
 
 Note that a console is started in all cases except 4 above.
-'''
+"""
+import argparse
 import sys
 import os.path
+from . import console, import_hook, transforms
 
 # It is assumed that code transformers are third-party modules
 # to be installed in a location from where they can be imported.
@@ -37,24 +39,69 @@ if not os.path.exists(fake_site_pkg):
 sys.path.insert(0, fake_site_pkg)
 
 
-from . import console, import_hook, transforms
-start_console = console.start_console
+if "-m" in sys.argv: 
+    parser = argparse.ArgumentParser(description="Description to be added.")
+    parser.add_argument(
+        "-s",
+        "--source",
+        help="""Source file to be transformed. 
+                Format: path.to.file -- Do not include an extension.""",
+    )
+    parser.add_argument(
+        "-x",
+        "--file_extension",
+        help="The file extension of the module to load; default=notpy")
 
+    parser.add_argument(
+        "-c",
+        "--convert",
+        help="Show the code transformed into standard Python.",
+        action='store_true')
 
-if "-m" in sys.argv:
-    if len(sys.argv) > 1:
-        for i in range(1, len(sys.argv)-1):
-            transforms.import_transformer(sys.argv[i])
+    args = parser.parse_args()
 
-        main_module = import_hook.import_main(sys.argv[-1])
-
-        if sys.flags.interactive:
-            main_dict = {}
-            for var in dir(main_module):
-                if var in ["__cached__", "__loader__",
-                           "__package__", "__spec__"]:
-                    continue
-                main_dict[var] = getattr(main_module, var)
-            start_console(main_dict)
+    if args.convert is not None:
+        show_python = True
+        import_hook.CONVERT = True
     else:
-        start_console()
+        show_python = False
+
+    if args.file_extension is not None:
+        import_hook.FILE_EXT = args.file_extension
+
+    if args.source is not None:
+        try:
+            main_module = import_hook.import_main(args.source)
+            if sys.flags.interactive:
+                main_dict = {}
+                for var in dir(main_module):
+                    if var in ["__cached__", "__loader__", "__package__", "__spec__"]:
+                        continue
+                    main_dict[var] = getattr(main_module, var)
+                console.start_console(local_vars=main_dict, show_python=show_python)
+        except ModuleNotFoundError:
+            print("Could not find module ", args.source)
+    else:
+        console.start_console(local_vars=None, show_python=show_python)
+
+
+# start_console = console.start_console
+# if "-m" in sys.argv:
+
+    
+
+#     if len(sys.argv) > 1:
+#         for i in range(1, len(sys.argv) - 1):
+#             transforms.import_transformer(sys.argv[i])
+
+#         main_module = import_hook.import_main(sys.argv[-1])
+
+#         if sys.flags.interactive:
+#             main_dict = {}
+#             for var in dir(main_module):
+#                 if var in ["__cached__", "__loader__", "__package__", "__spec__"]:
+#                     continue
+#                 main_dict[var] = getattr(main_module, var)
+#             start_console(main_dict)
+#     else:
+#         start_console()
