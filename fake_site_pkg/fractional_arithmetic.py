@@ -18,4 +18,4 @@ def transform_ast(tree):
     ast.fix_missing_locations(tree1)
     return tree1
 
-export = {'Fraction':Fraction}
+export_to_console = {'Fraction':Fraction}

@@ -1,4 +1,5 @@
 import ast
+import builtins
 import io
 import code
 import platform
@@ -86,18 +87,20 @@ class PyextensionsInteractiveConsole(code.InteractiveConsole):
                     print("#", line)
         return more
 
+
 def import_transformer(name):
-    global console
     mod = transforms.import_transformer(name)
     if hasattr(mod, 'export_to_console'):
-        globals().update(mod.export_to_console)
+        for key in mod.export_to_console:
+            setattr(builtins, key, mod.export_to_console[key]) 
     return mod
 
 
 def start_console(local_vars=None, show_python=False):
     """Starts a console; modified from code.interact"""
-    global console
-    console_defaults = {"import_transformer": transforms.import_transformer}
+    console_defaults = {
+        "import_transformer": import_transformer
+    }
 
     if local_vars is None:
         local_vars = console_defaults
@@ -106,4 +109,5 @@ def start_console(local_vars=None, show_python=False):
 
     sys.ps1 = prompt
     console = PyextensionsInteractiveConsole(locals=local_vars, show_python=show_python)
+    console.locals.update(console_defaults)
     console.interact(banner=banner)

@@ -80,8 +80,8 @@ if "-m" in sys.argv:
     if args.transformers is not None:
         for tr in args.transformers:
             console_dict[tr] = transforms.import_transformer(tr)
-            if hasattr(console_dict[tr], 'export'):
-                console_dict.update(console_dict[tr].export)
+            if hasattr(console_dict[tr], 'export_to_console'):
+                console_dict.update(console_dict[tr].export_to_console)
 
     if args.source is not None:
         try:
