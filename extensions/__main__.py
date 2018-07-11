@@ -1,0 +1,2 @@
+print("inside main")
+pass
