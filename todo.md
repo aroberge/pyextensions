@@ -1,7 +1,7 @@
 # todo
 
 - [x] use argparse for options
-- [ ] implement ast transformation with example
+- [x] implement ast transformation with example
 - [ ] implement bytecode transformation with example
 - [ ] ensure that transformations listed in source file are done in order
 - [x] show transformed source in console

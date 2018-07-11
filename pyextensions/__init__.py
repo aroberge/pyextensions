@@ -23,6 +23,7 @@ import argparse
 import sys
 import os.path
 from . import console, import_hook, transforms
+start_console = console.start_console
 
 # It is assumed that code transformers are third-party modules
 # to be installed in a location from where they can be imported.
@@ -39,7 +40,8 @@ if not os.path.exists(fake_site_pkg):
 sys.path.insert(0, fake_site_pkg)
 
 
-if "-m" in sys.argv: 
+if "-m" in sys.argv:
+    console_dict = {}
     parser = argparse.ArgumentParser(description="Description to be added.")
     parser.add_argument(
         "-s",
@@ -58,6 +60,12 @@ if "-m" in sys.argv:
         help="Show the code transformed into standard Python.",
         action='store_true')
 
+    parser.add_argument(
+        "-t",
+        "--transformers",
+        nargs = '+',
+        help="Transformers to import")    
+
     args = parser.parse_args()
 
     if args.convert:
@@ -69,6 +77,12 @@ if "-m" in sys.argv:
     if args.file_extension is not None:
         import_hook.FILE_EXT = args.file_extension
 
+    if args.transformers is not None:
+        for tr in args.transformers:
+            console_dict[tr] = transforms.import_transformer(tr)
+            if hasattr(console_dict[tr], 'export'):
+                console_dict.update(console_dict[tr].export)
+
     if args.source is not None:
         try:
             main_module = import_hook.import_main(args.source)
@@ -78,10 +92,9 @@ if "-m" in sys.argv:
                     if var in ["__cached__", "__loader__", "__package__", "__spec__"]:
                         continue
                     main_dict[var] = getattr(main_module, var)
-                console.start_console(local_vars=main_dict, show_python=show_python)
+                start_console(local_vars=main_dict, show_python=show_python)
         except ModuleNotFoundError:
             print("Could not find module ", args.source, "\n")
             raise
     else:
-        console.start_console(local_vars=None, show_python=show_python)
-
+        start_console(local_vars=console_dict, show_python=show_python)

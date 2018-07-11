@@ -17,3 +17,5 @@ def transform_ast(tree):
     # Add lineno & col_offset to the nodes we created
     ast.fix_missing_locations(tree1)
     return tree1
+
+export = {'Fraction':Fraction}

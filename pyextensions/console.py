@@ -86,16 +86,24 @@ class PyextensionsInteractiveConsole(code.InteractiveConsole):
                     print("#", line)
         return more
 
-
-console_defaults = {"import_transformer": transforms.import_transformer}
+def import_transformer(name):
+    global console
+    mod = transforms.import_transformer(name)
+    if hasattr(mod, 'export_to_console'):
+        globals().update(mod.export_to_console)
+    return mod
 
 
 def start_console(local_vars=None, show_python=False):
     """Starts a console; modified from code.interact"""
+    global console
+    console_defaults = {"import_transformer": transforms.import_transformer}
+
     if local_vars is None:
-        local_vars = console_default
+        local_vars = console_defaults
     else:
         local_vars.update(console_defaults)
+
     sys.ps1 = prompt
     console = PyextensionsInteractiveConsole(locals=local_vars, show_python=show_python)
     console.interact(banner=banner)
