@@ -87,20 +87,17 @@ class ExtensionLoader(Loader):
         with open(self.filename) as f:
             source = f.read()
 
-        if CONVERT:
+        transforms.identify_requested_transformers(source)
+
+        if CONVERT and self.filename.endswith(FILE_EXT):
             print("############### Original source: ############\n")
             print(source)
 
         if transforms.TRANSFORMERS:
+            source = transforms.add_all_imports(source)
             source = transforms.apply_source_transformations(source)
-        else:
-            for line in source.split("\n"):
-                if line.startswith("#ext "):
-                    ## transforms.apply_source_transformations will extract all such relevant
-                    ## lines and add them all relevant transformers
-                    source = transforms.apply_source_transformations(source)
-                    break
-        if CONVERT:
+
+        if CONVERT and self.filename.endswith(FILE_EXT):
             print("\n############### Converted source: ############\n")
             print(source)
             print("="*50, "\n")

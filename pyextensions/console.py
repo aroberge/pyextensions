@@ -30,6 +30,9 @@ class PyextensionsInteractiveConsole(code.InteractiveConsole):
     def __init__(self, locals=None, show_python=False):
         self.show_python = show_python
         super().__init__(locals=locals)
+        source = transforms.add_all_imports('').split("\n")
+        for line in source:
+            self.push(line)
 
     def push(self, line):
         """Transform and push a line to the interpreter.
@@ -47,6 +50,11 @@ class PyextensionsInteractiveConsole(code.InteractiveConsole):
         """
         self.buffer.append(line)
 
+        # Source transformation using the tokenize module occasionally mess
+        # up if a statement ends with a colon. To cure this problem,
+        # we temporarily add a pass keyword to complete the block,
+        # removing it after the transformation has
+
         add_pass = False
         if line.rstrip(" ").endswith(":"):
             add_pass = True
@@ -54,10 +62,10 @@ class PyextensionsInteractiveConsole(code.InteractiveConsole):
         if add_pass:
             source += "pass"
 
-        _transformed = False
+        identical = True
         newsource = transforms.apply_source_transformations(source)
         if newsource != source:
-            _transformed = True
+            identical = False
 
         source = newsource
         if add_pass:
@@ -65,15 +73,19 @@ class PyextensionsInteractiveConsole(code.InteractiveConsole):
             if source.endswith("pass"):
                 source = source[:-4]
 
-        # some transformations may strip an empty line meant to end a block
-        if not self.buffer[-1]:
-            source += "\n"
-
         try:
             tree = transforms.apply_ast_transformations(source)
             source = _unparse(tree)
         except Exception:
             pass
+
+        # Some transformations may add or strip an empty line meant to 
+        # end a block. We ensure that the source to be compiled has
+        # the same ending as the code entered
+        if self.buffer[-1].strip():
+            source = source.rstrip()
+        else:
+            source += "\n"  # might now always be needed
 
         try:
             more = self.runsource(source, self.filename)
@@ -82,7 +94,7 @@ class PyextensionsInteractiveConsole(code.InteractiveConsole):
 
         if not more:
             self.resetbuffer()
-            if self.show_python and _transformed:
+            if self.show_python and not identical:
                 for line in source.split("\n"):
                     print("#", line)
         return more

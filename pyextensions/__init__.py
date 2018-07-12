@@ -64,7 +64,7 @@ if "-m" in sys.argv:
         "-t",
         "--transformers",
         nargs = '+',
-        help="Transformers to import")    
+        help="Transformers to import if not loading source file")    
 
     args = parser.parse_args()
 
@@ -76,12 +76,6 @@ if "-m" in sys.argv:
 
     if args.file_extension is not None:
         import_hook.FILE_EXT = args.file_extension
-
-    if args.transformers is not None:
-        for tr in args.transformers:
-            console_dict[tr] = transforms.import_transformer(tr)
-            if hasattr(console_dict[tr], 'export_to_console'):
-                console_dict.update(console_dict[tr].export_to_console)
 
     if args.source is not None:
         try:
@@ -97,4 +91,7 @@ if "-m" in sys.argv:
             print("Could not find module ", args.source, "\n")
             raise
     else:
+        if args.transformers is not None:
+            for tr in args.transformers:
+                console_dict[tr] = transforms.import_transformer(tr)
         start_console(local_vars=console_dict, show_python=show_python)

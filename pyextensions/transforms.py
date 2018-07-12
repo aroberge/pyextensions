@@ -76,10 +76,27 @@ def identify_requested_transformers(source):
     """
     lines = source.split("\n")
     linenumbers = []
+    clear = False
     for number, line in enumerate(lines):
         if line.startswith("#ext "):
+            if not clear:
+                TRANSFORMERS.clear()
+                clear = True
             add_transformers(line)
     return None
+
+
+def add_all_imports(source):
+    """Some transformers may require that other modules be imported
+    in the source code for it to work properly.
+    """
+    for name in TRANSFORMERS:
+        tr_module = import_transformer(name)
+        if hasattr(tr_module, 'add_import'):
+            source = tr_module.add_import() + source
+
+    return source
+
 
 
 def apply_source_transformations(source):
@@ -96,8 +113,6 @@ def apply_source_transformations(source):
        transformers and keep retrying them until either they all succeeded
        or a fixed set of them fails twice in a row.
     """
-    identify_requested_transformers(source)
-
     # Some transformer fail when multiple non-Python constructs
     # are present. So, we loop multiple times keeping track of
     # which transformations have been unsuccessfully performed.
@@ -136,7 +151,6 @@ def apply_ast_transformations(source):
 
        which returns a tranformed ast.
     """
-    identify_requested_transformers(source)
     tree = ast.parse(source)
     # Some transformer fail when multiple non-Python constructs
     # are present. So, we loop multiple times keeping track of
