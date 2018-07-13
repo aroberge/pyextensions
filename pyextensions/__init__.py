@@ -40,6 +40,15 @@ A different extension that ``notpy`` can be specified as follows::
 Note that you really should not choose "py" and most definitely not "pyc" 
 as the file extension for files to be processed by ``pyextensions``.
 
+If you want to view how pyextensions transformed an input file,
+you can use the ``-d`` or ``--diff`` option::
+
+    python -m pyextensions -s name -d
+    python -m pyextensions --source name --diff
+
+This will use Python's ``difflib`` module and write the result in a
+file named ``name.html`` in the current directory.
+
 .. todo::
     
     A reminder
