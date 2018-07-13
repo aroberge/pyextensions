@@ -3,7 +3,15 @@ code transformers. It also contains a function, `transform`, which
 takes care of invoking all known transformers to convert a source code.
 """
 import ast
+import io
 import sys
+
+from . import unparse
+
+def my_unparse(tree):
+    v = io.StringIO()
+    unparse.Unparser(tree, file=v)
+    return v.getvalue()
 
 
 class NullTransformer:
@@ -14,6 +22,7 @@ class NullTransformer:
         return source
 
 TRANSFORMERS = {}
+AST_TRANSFORMERS = []
 
 
 def add_transformers(line):
@@ -37,6 +46,9 @@ def import_transformer(name):
        custom method.
     """
     if name in TRANSFORMERS:
+        if not name in AST_TRANSFORMERS:
+            if hasattr(TRANSFORMERS[name], 'transform_ast'):
+                AST_TRANSFORMERS.append(name)
         return TRANSFORMERS[name]
 
     # We are adding a transformer built from normal/standard Python code.
@@ -50,7 +62,9 @@ def import_transformer(name):
         # Some transformers are not allowed in the console.
         # If an attempt is made to activate one of them in the console,
         # we replace it by a transformer that does nothing and print a
-        # message specific to that transformer as written in its module.
+    # message specific to that transformer as written in its module.
+        if hasattr(TRANSFORMERS[name], 'transform_ast'):
+            AST_TRANSFORMERS.append(name)
     except ImportError:
         sys.stderr.write(
             "Warning: Import Error in add_transformers: %s not found\n" % name
@@ -84,6 +98,7 @@ def identify_requested_transformers(source):
         if line.startswith("#ext "):
             if not clear:
                 TRANSFORMERS.clear()
+                AST_TRANSFORMERS.clear()
                 clear = True
             add_transformers(line)
     return None
@@ -146,39 +161,24 @@ def apply_source_transformations(source):
 
 
 def apply_ast_transformations(source):
-    """Used to convert the source code, making use of known transformers.
+    """Used to convert the source code into an AST tree and applying
+       all AST transformer specified in the source code. It returns
+       a (potentially transformed) AST tree.
 
-       "transformers" are modules which must contain a function
+       "AST transformers" are modules which must contain a function
 
            transform_ast(tree)
 
-       which returns a tranformed ast.
+       which return another AST tree.
     """
+    if not AST_TRANSFORMERS:
+        return source
     tree = ast.parse(source)
-    # Some transformer fail when multiple non-Python constructs
-    # are present. So, we loop multiple times keeping track of
-    # which transformations have been unsuccessfully performed.
-    not_done = TRANSFORMERS
-    while True:
-        failed = {}
-        for name in not_done:
-            tr_module = import_transformer(name)
-            if hasattr(tr_module, 'transform_ast'):
-                try:
-                    source = tr_module.transform_ast(tree)
-                except Exception as e:
-                    failed[name] = tr_module
+    for name in AST_TRANSFORMERS:
+        tr_module = TRANSFORMERS[name]
+        try:
+            tree = tr_module.transform_ast(tree)
+        except Exception as e:
+            print(f"Warning: the {name} AST transformation could not be done.")
 
-        if not failed:
-            break
-
-        # If the exact same set of transformations are not performed
-        # twice in a row, there is no point in trying out again.
-        if failed == not_done:
-            print("Warning: the following source transformations could not be done:")
-            for key in failed:
-                print(key)
-            break
-        not_done = failed  # attempt another pass
-
-    return tree
+    return my_unparse(tree)

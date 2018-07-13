@@ -117,9 +117,9 @@ class ExtensionLoader(Loader):
             print(source)
             print("=" * 50, "\n")
 
-        tree = transforms.apply_ast_transformations(source)
-        co = compile(tree, module.__name__, "exec")
-        exec(co, vars(module))
+        source = transforms.apply_ast_transformations(source)
+        # co = compile(tree, module.__name__, "exec")
+        exec(source, vars(module))
 
     def write_html_diff(self, name, original, transformed):
         """Writes an html file showing the difference between the original

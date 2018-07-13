@@ -26,10 +26,10 @@ There is a simpler way: it is possible to run code with a modified syntax using 
 However, not everyone might want to figure out how to write an import hook:
 
     | [page 420] *...it should be emphasized that Python's module, package and import
-      mechanism is one of the most complicated parts fo the entire language --
+      mechanism is one of the most complicated parts of the entire language --
       often poorly understood by even the most seasoned Python programmers
       unless they've devoted effort to peeling back the covers.*
-    |     ...
+    |     ... long discussion ...
     | [page 428] *Assuming that your head hasn't completely exploded at this point, ...
       Last, but not least, spending some time sleeping with PEP 302 and the
       documentation for* importlib *under your pillow may be advisable.*
@@ -61,9 +61,3 @@ Quick links to topics
 
 .. _Pyxl project: https://github.com/dropbox/pyxl
 
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`

@@ -1,8 +1,17 @@
-"""Converts integers literals into instances of the Fraction"""
-import ast
+"""Converts integers literals into instances of the Fraction class.
+   This works for doing using Python exclusively to do integer arithmetics but it
+   fails miserably in other contexts.  For exemple::
 
-def add_import():
-    return "from fractions import Fraction\n"
+        for i in range(3):
+            ...
+   gets converted to
+
+        for i in range(Fraction(3)):
+            ...
+
+   which fails. It is only meant as a demo of AST transformations.
+   """
+import ast
 
 class FractionWrapper(ast.NodeTransformer):
     """Wraps all integers in a call to Integer()"""
@@ -18,3 +27,5 @@ def transform_ast(tree):
     ast.fix_missing_locations(tree)
     return tree
 
+def add_import():
+    return "from fractions import Fraction\n"

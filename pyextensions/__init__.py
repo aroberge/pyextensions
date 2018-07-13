@@ -1,6 +1,6 @@
 """
 pyextensions sets up an import hook which
-makes it possible to run a file that contains modified Python syntax
+makes it possible to run a file that contains modified Python syntax,
 provided the relevant source transformers can be imported.
 
 .. warning::
@@ -40,6 +40,9 @@ A different extension that ``notpy`` can be specified as follows::
 Note that you really should not choose "py" and most definitely not "pyc" 
 as the file extension for files to be processed by ``pyextensions``.
 
+Additional utilities
+--------------------
+
 If you want to view how pyextensions transformed an input file,
 you can use the ``-d`` or ``--diff`` option::
 
@@ -50,9 +53,38 @@ This will use Python's ``difflib`` module and write the result in a
 file named ``name.html`` in the current directory.
 
 .. todo::
+
+   * document ``-c`` (``--convert``)
+   * Implement ``-o [filename]`` (``--output``) and document
+
+Quirky console
+---------------
+
+.. note::
+
+    Python's interpreter console (REPL) is a useful tool for quick demos
+    and code explorations. pyextensions includes a console which works
+    reasonably well in most situations but can fail unexpectedly.
+    To understand why, please console the documentation.
+
+The simplest way to invoke pyextension's console is as follows::
+
+    python -m pyextensions
+
+
+
+.. todo::
     
-    Add info about ``--convert`` and about the console.
-    Also add info about the transformers.
+    * document ``-c`` when using the console
+    * document ``-d`` when using the console
+    * document ``-t`` when using the console
+
+Python's interactive mode
+-------------------------
+
+..todo::
+
+    Document Python's ``-i`` flag (interactive mode)
 
 """
 import argparse

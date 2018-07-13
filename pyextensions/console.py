@@ -10,8 +10,7 @@ from . import transforms
 from . import version
 from . import unparse
 
-
-def _unparse(tree):
+def my_unparse(tree):
     v = io.StringIO()
     unparse.Unparser(tree, file=v)
     return v.getvalue()
@@ -25,8 +24,13 @@ prompt = "->> "
 
 
 class PyextensionsInteractiveConsole(code.InteractiveConsole):
-    """A Python console that emulates the normal Python interpreter
-       except that it support experimental code transformations."""
+    """A Python console that tries to emulate the normal Python interpreter
+       except that it support experimental code transformations.
+       It inherits from cPython's ``code.InteractiveConsole``.
+
+       Like the normal Python's interactive console, it attempts to evaluate
+       code entered one line at a time by a user.
+    """
 
     def __init__(self, locals=None, show_python=False):
         self.show_python = show_python
@@ -37,11 +41,11 @@ class PyextensionsInteractiveConsole(code.InteractiveConsole):
 
 
     def push(self, line):
-        """Transform and push a line to the interpreter.
+        """Pushes a transformed line to the interpreter.
 
         The line should not have a trailing newline; it may have
-        internal newlines.  The line is appended to a buffer and the
-        interpreter's runsource() method is called with the
+        internal newlines.  The line is transformed and appended to a buffer.
+        The interpreter's runsource() method is called with the
         concatenated contents of the buffer as source.  If this
         indicates that the command was executed or invalid, the buffer
         is reset; otherwise, the command is incomplete, and the buffer
@@ -50,34 +54,30 @@ class PyextensionsInteractiveConsole(code.InteractiveConsole):
         with in some way (this is the same as runsource()).
 
         """
+        assert not line.endswith("\n")
         self.buffer.append(line)
-
-        source, self.identical = self.do_source_transformations(line)
+        source = "\n".join(self.buffer)
+        self.identical = True
+        newsource = self.do_transformations(source)
+        if newsource != source:
+            self.identical = False
 
         try:
-            tree = transforms.apply_ast_transformations(source)
-            source = _unparse(tree)
-        except Exception:
-            pass
-
-        source = self.fix_ending(source)
-
-        self._source = source  # in case we need it if we want to show a syntax
-        # error - as we reuse the original method rather
-        # than rewriting it. See showsyntaxerror() below
-        try:
-            more = self.runsource(source, self.filename)
+            more = self.runsource(newsource, self.filename)
         except SystemExit:
             os._exit(1)
 
         if not more:
             self.resetbuffer()
             if self.show_python and not self.identical:
-                self.show_converted(source)
+                self.show_converted(newsource)
         return more
 
     def show_converted(self, source):
         """Prints the converted source"""
+        if transforms.AST_TRANSFORMERS and not self.ast_transformation_done:
+            print("\n### Note: AST transformation could not be done.")
+            print("transformers = ", transforms.AST_TRANSFORMERS, "\n")
         print(" ===")
         for line in source.split("\n"):
             print("|", line)
@@ -91,39 +91,29 @@ class PyextensionsInteractiveConsole(code.InteractiveConsole):
             self.show_converted(self._source)
         super().showsyntaxerror(filename=filename)
 
-    def do_source_transformations(self, line):
-        """Performs the source transformations on the current content.
+    def do_transformations(self, source):
+        """Performs the source and AST transformations on the current content.
 
-           Returns the transformed source and a flag indicating if
-           the transformed source is different from the original source
+           Returns the transformed source.
         """
-        # Source transformation may raise an exception
-        # if a statement ends with a colon, not knowing how to deal with
-        # To cure this problem, we temporarily add a pass keyword to
-        # complete such block, removing it after the transformation has
+        self.ast_transformation_done = False
+        source = transforms.apply_source_transformations(source)
+        try:
+            tree = transforms.apply_ast_transformations(source)
+            source = my_unparse(tree)
+            self.ast_transformation_done = True
+        except Exception:
+            pass
+        source = self.fix_ending(source)
 
-        add_pass = False
-        if line.rstrip(" ").endswith(":"):
-            add_pass = True
-        source = "\n".join(self.buffer)
-        if add_pass:
-            source += "pass"
+        self._source = source  # saved in case we need it if we want to show
+        # a syntax error.See showsyntaxerror() above
+        return source
 
-        identical = True
-        newsource = transforms.apply_source_transformations(source)
-        if newsource != source:
-            identical = False
-
-        source = newsource
-        if add_pass:
-            source = source.rstrip(" ")
-            if source.endswith("pass"):
-                source = source[:-4]
-        return source, identical
 
     def fix_ending(self, source):
-        """Ensures that the last blank lines of the transformed source are consistent
-        with what was provided by the user."""
+        """Ensures that the last blank lines of the transformed source are 
+        consistent with what was provided by the user."""
 
         # Some transformations may add or strip an empty line meant to
         # end a block, or strip non-empty lines (but with spaces) at the end
@@ -138,19 +128,19 @@ class PyextensionsInteractiveConsole(code.InteractiveConsole):
                 blank_lines.append(line)
             else:
                 break
-
         blank_lines = reversed(blank_lines)
-        lines = source.rstrip().split("\n")
+
+        source = source.rstrip()
+        if source:
+            lines = source.split("\n")
+        else:
+            lines = []
         lines.extend(blank_lines)
         source = "\n".join(lines)
         return source
 
-
 def import_transformer(name):
     mod = transforms.import_transformer(name)
-    if hasattr(mod, "export_to_console"):
-        for key in mod.export_to_console:
-            setattr(builtins, key, mod.export_to_console[key])
     return mod
 
 
