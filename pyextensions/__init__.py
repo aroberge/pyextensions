@@ -51,7 +51,8 @@ file named ``name.html`` in the current directory.
 
 .. todo::
     
-    A reminder
+    Add info about ``--convert`` and about the console.
+    Also add info about the transformers.
 
 """
 import argparse
