@@ -8,7 +8,7 @@ if "%SPHINXBUILD%" == "" (
 	set SPHINXBUILD=sphinx-build
 )
 set SOURCEDIR=source
-set BUILDDIR=..
+set BUILDDIR=.
 set SPHINXPROJ=pyextensions
 
 if "%1" == "" goto help
