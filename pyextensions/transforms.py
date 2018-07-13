@@ -70,9 +70,12 @@ def import_transformer(name):
 
 
 def identify_requested_transformers(source):
-    """Scan a source for lines of the form
-           #ext transformer1 [transformer2]
-       identifying transformers to be used and ensure that they are imported.
+    """
+    Scan a source for lines of the form::
+
+        #ext transformer1 [transformer2 ...]
+
+    identifying transformers to be used and ensure that they are imported.
     """
     lines = source.split("\n")
     linenumbers = []

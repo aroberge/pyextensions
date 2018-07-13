@@ -6,9 +6,9 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Welcome to pyextensions’s documentation! &#8212; pyextensions 0.1 documentation</title>
+    <title>Pyextensions: making it easier to extend Python’s syntax &#8212; pyextensions 0.1 documentation</title>
     
-    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/readable.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     
     <script type="text/javascript">
@@ -26,24 +26,102 @@
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Invocation" href="invocation.html" />
    
-  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
-  
-  
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
 
   </head>
   <body role="document">
   
+  
+  <div class="indexwrapper">
+  
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="invocation.html" title="Invocation"
+             accesskey="N">next</a> |</li>
+        <li class="nav-item nav-item-0"><a href="#">pyextensions 0.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="welcome-to-pyextensions-s-documentation">
-<h1>Welcome to pyextensions&#8217;s documentation!<a class="headerlink" href="#welcome-to-pyextensions-s-documentation" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="pyextensions-making-it-easier-to-extend-python-s-syntax">
+<h1>Pyextensions: making it easier to extend Python&#8217;s syntax<a class="headerlink" href="#pyextensions-making-it-easier-to-extend-python-s-syntax" title="Permalink to this headline">¶</a></h1>
+<p>To modify Python&#8217;s syntax, all you need to do is:</p>
+<ol class="arabic simple">
+<li>Get a copy of the CPython&#8217;s code repository and all the required compilers
+for your platform.</li>
+<li>Modify the grammar file to add rules for the new syntax.</li>
+<li>Modify the AST generation code; this requires a knowledge of C</li>
+<li>Compile the AST into bytecode</li>
+<li>Recompile the modified Python interpreter</li>
+</ol>
+<p>There is a simpler way: it is possible to run code with a modified syntax using import hooks.</p>
+<blockquote>
+<div><p><em>I think that the majority of Python programmers have no idea that you
+can even write an import hook at all, let alone how to do it.</em></p>
+<blockquote>
+<div>Steve d&#8217;Aprano
+<a class="reference external" href="https://mail.python.org/pipermail/python-ideas/2015-May/033633.html">https://mail.python.org/pipermail/python-ideas/2015-May/033633.html</a></div></blockquote>
+</div></blockquote>
+<p>However, not everyone might want to figure out how to write an import hook:</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line">[page 420] <em>...it should be emphasized that Python&#8217;s module, package and import
+mechanism is one of the most complicated parts fo the entire language &#8211;
+often poorly understood by even the most seasoned Python programmers
+unless they&#8217;ve devoted effort to peeling back the covers.</em></div>
+<div class="line-block">
+<div class="line">...</div>
+</div>
+<div class="line">[page 428] <em>Assuming that your head hasn&#8217;t completely exploded at this point, ...
+Last, but not least, spending some time sleeping with PEP 302 and the
+documentation for</em> importlib <em>under your pillow may be advisable.</em></div>
+</div>
+<blockquote>
+<div>Python Cookbook, 3rd edition, by David Beazley and Brian K. Jones</div></blockquote>
+</div></blockquote>
+<p>I believe that standard library should include a (reliable) module that would
+facilitate adding syntax changes to Python and run programs with this new
+syntax. Pyextensions is a not-so-reliable module that is a proof of concept
+for this goal.</p>
+<div class="section" id="another-possibility">
+<h2>Another possibility<a class="headerlink" href="#another-possibility" title="Permalink to this headline">¶</a></h2>
+<p>In addition to using import hooks, it is possible to run code with a modified
+syntax by using a specially crafted codec. See for example the <a class="reference external" href="https://github.com/dropbox/pyxl">Pyxl project</a>.
+This is likely not as flexible as the approach we suggest using import hooks.</p>
+</div>
+<div class="section" id="quick-links-to-topics">
+<h2>Quick links to topics<a class="headerlink" href="#quick-links-to-topics" title="Permalink to this headline">¶</a></h2>
 <div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="invocation.html"> Invocation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="invocation.html#module-pyextensions">pyextension&#8217;s</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="motivation.html"> Motivation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html"> Contents of various modules</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="modules.html#module-pyextensions.import_hook">import_hook</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules.html#module-pyextensions.transforms">transforms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules.html#module-pyextensions.console">console</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules.html#unparse">unparse</a></li>
+</ul>
+</li>
+</ul>
+</div>
 </div>
 </div>
 <div class="section" id="indices-and-tables">
@@ -63,16 +141,19 @@
         <div class="sphinxsidebarwrapper">
   <h3><a href="#">Table Of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">Welcome to pyextensions&#8217;s documentation!</a></li>
+<li><a class="reference internal" href="#">Pyextensions: making it easier to extend Python&#8217;s syntax</a><ul>
+<li><a class="reference internal" href="#another-possibility">Another possibility</a></li>
+<li><a class="reference internal" href="#quick-links-to-topics">Quick links to topics</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
 </ul>
-<div class="relations">
 <h3>Related Topics</h3>
 <ul>
-  <li><a href="#">Documentation overview</a><ul>
+  <li><a href="#">Documentation index</a><ul>
+      <li>Next: <a href="invocation.html" title="next chapter">Invocation</a></li>
   </ul></li>
 </ul>
-</div>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -94,20 +175,12 @@
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="footer">
-      &copy;2018, André Roberge.
-      
-      |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.6</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
-      
-      |
-      <a href="_sources/index.rst.txt"
-          rel="nofollow">Page source</a>
-    </div>
-
-    
-
-    
+  <div class="footer">
+    &copy; Copyright 2018, André Roberge.
+    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.6.
+  </div>
+  
+  </div>
+  
   </body>
 </html>

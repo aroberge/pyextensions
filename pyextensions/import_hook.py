@@ -1,6 +1,6 @@
 """A custom importer making use of the import hook capability
 """
-
+import difflib
 import os.path
 import sys
 
@@ -15,18 +15,20 @@ from . import transforms
 MAIN_MODULE_NAME = None
 FILE_EXT = "notpy"
 CONVERT = False
+DIFF = False
 
 
 def import_main(name):
     """Imports the module that is to be interpreted as the main module.
 
        pyextensions is often invoked with a script meant to be run as the
-       main module its source is transformed.  The invocation will be
+       main module its source is transformed with the -s (or --source) option,
+       as in::
 
-       python -m pyextensions [trans1 trans2 ...] main_script
+           python -m pyextensions -s name
 
        Python identifies pyextensions as the main script; we artificially
-       change this so that "main_script" is properly identified as such.
+       change this so that "main_script" is properly identified as ``name``.
     """
     global MAIN_MODULE_NAME
     MAIN_MODULE_NAME = name
@@ -55,6 +57,7 @@ class ExtensionMetaFinder(MetaPathFinder):
             else:
                 filename = os.path.join(entry, name + "." + FILE_EXT)
                 submodule_locations = None
+
             if not os.path.exists(filename):
                 continue
 
@@ -80,6 +83,16 @@ class ExtensionLoader(Loader):
         """import the source code, transforma it before executing it so that
            it is known to Python."""
         global MAIN_MODULE_NAME
+
+        if not self.filename.endswith(FILE_EXT) and not self.filename.endswith(
+            "__init__.py"
+        ):
+            print("Fatal error: ExtensionLoader is asked to load a normal file.")
+            print("filename:", self.filename)
+            print("Expected extension:", FILE_EXT)
+            raise SystemExit
+
+        name = module.__name__
         if module.__name__ == MAIN_MODULE_NAME:
             module.__name__ = "__main__"
             MAIN_MODULE_NAME = None
@@ -89,24 +102,35 @@ class ExtensionLoader(Loader):
 
         transforms.identify_requested_transformers(source)
 
-        if CONVERT and self.filename.endswith(FILE_EXT):
-            print("############### Original source: ############\n")
-            print(source)
-
         if transforms.TRANSFORMERS:
+            original = source
             source = transforms.add_all_imports(source)
             source = transforms.apply_source_transformations(source)
 
+            if DIFF and original != source:
+                self.write_html_diff(name, original, source)
+
         if CONVERT and self.filename.endswith(FILE_EXT):
+            print("############### Original source: ############\n")
+            print(original)
             print("\n############### Converted source: ############\n")
             print(source)
-            print("="*50, "\n")
+            print("=" * 50, "\n")
 
         tree = transforms.apply_ast_transformations(source)
         co = compile(tree, module.__name__, "exec")
         exec(co, vars(module))
 
-    def get_code(self, _):
-        """Hack to silence an error when running pyextensions as main script."""
-        return compile("None", "<string>", "eval")
+    def write_html_diff(self, name, original, transformed):
+        """Writes an html file showing the difference between the original
+           and the transformed source."""
+        html = name + ".html"
+        fromlines = original.split("\n")
+        tolines = transformed.split("\n")
 
+        diff = difflib.HtmlDiff().make_file(
+            fromlines, tolines, name + "." + FILE_EXT, name + ".py"
+        )
+        with open(html, "w") as the_file:
+            the_file.write(diff)
+        print("Diff file writen to", html)
