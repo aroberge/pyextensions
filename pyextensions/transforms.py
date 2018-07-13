@@ -135,6 +135,7 @@ def apply_source_transformations(source):
     # are present. So, we loop multiple times keeping track of
     # which transformations have been unsuccessfully performed.
     not_done = TRANSFORMERS
+    first_exception = None
     while True:
         failed = {}
         for name in not_done:
@@ -144,6 +145,8 @@ def apply_source_transformations(source):
                     source = tr_module.transform_source(source)
                 except Exception as e:
                     failed[name] = tr_module
+                    if first_exception is None:
+                        first_exception = e
 
         if not failed:
             break
@@ -151,10 +154,11 @@ def apply_source_transformations(source):
         # If the exact same set of transformations are not performed
         # twice in a row, there is no point in trying out again.
         if failed == not_done:
-            print("Warning: the following source transformations could not be done:")
-            for key in failed:
-                print(key)
-            break
+            # add verbose option
+            # print("Warning: the following source transformations could not be done:")
+            # for key in failed:
+            #     print(key)
+            raise first_exception
         not_done = failed  # attempt another pass
 
     return source
@@ -179,6 +183,8 @@ def apply_ast_transformations(source):
         try:
             tree = tr_module.transform_ast(tree)
         except Exception as e:
-            print(f"Warning: the {name} AST transformation could not be done.")
+            pass
+            # add verbose option
+            # print(f"Warning: the {name} AST transformation could not be done.")
 
     return my_unparse(tree)

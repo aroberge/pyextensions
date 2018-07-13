@@ -173,9 +173,9 @@
             <span class="nb">print</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">50</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
 
-        <span class="n">tree</span> <span class="o">=</span> <span class="n">transforms</span><span class="o">.</span><span class="n">apply_ast_transformations</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
-        <span class="n">co</span> <span class="o">=</span> <span class="nb">compile</span><span class="p">(</span><span class="n">tree</span><span class="p">,</span> <span class="n">module</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="s2">&quot;exec&quot;</span><span class="p">)</span>
-        <span class="n">exec</span><span class="p">(</span><span class="n">co</span><span class="p">,</span> <span class="nb">vars</span><span class="p">(</span><span class="n">module</span><span class="p">))</span></div>
+        <span class="n">source</span> <span class="o">=</span> <span class="n">transforms</span><span class="o">.</span><span class="n">apply_ast_transformations</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
+        <span class="c1"># co = compile(tree, module.__name__, &quot;exec&quot;)</span>
+        <span class="n">exec</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="nb">vars</span><span class="p">(</span><span class="n">module</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="ExtensionLoader.write_html_diff"><a class="viewcode-back" href="../../modules.html#pyextensions.import_hook.ExtensionLoader.write_html_diff">[docs]</a>    <span class="k">def</span> <span class="nf">write_html_diff</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">original</span><span class="p">,</span> <span class="n">transformed</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Writes an html file showing the difference between the original</span>

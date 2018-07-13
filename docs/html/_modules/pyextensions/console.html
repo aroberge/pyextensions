@@ -66,8 +66,7 @@
 <span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">version</span>
 <span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">unparse</span>
 
-
-<span class="k">def</span> <span class="nf">_unparse</span><span class="p">(</span><span class="n">tree</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">my_unparse</span><span class="p">(</span><span class="n">tree</span><span class="p">):</span>
     <span class="n">v</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">()</span>
     <span class="n">unparse</span><span class="o">.</span><span class="n">Unparser</span><span class="p">(</span><span class="n">tree</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">v</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">v</span><span class="o">.</span><span class="n">getvalue</span><span class="p">()</span>
@@ -81,8 +80,13 @@
 
 
 <div class="viewcode-block" id="PyextensionsInteractiveConsole"><a class="viewcode-back" href="../../modules.html#pyextensions.console.PyextensionsInteractiveConsole">[docs]</a><span class="k">class</span> <span class="nc">PyextensionsInteractiveConsole</span><span class="p">(</span><span class="n">code</span><span class="o">.</span><span class="n">InteractiveConsole</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;A Python console that emulates the normal Python interpreter</span>
-<span class="sd">       except that it support experimental code transformations.&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;A Python console that tries to emulate the normal Python interpreter</span>
+<span class="sd">       except that it support experimental code transformations.</span>
+<span class="sd">       It inherits from cPython&#39;s ``code.InteractiveConsole``.</span>
+
+<span class="sd">       Like the normal Python&#39;s interactive console, it attempts to evaluate</span>
+<span class="sd">       code entered one line at a time by a user.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">locals</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">show_python</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">show_python</span> <span class="o">=</span> <span class="n">show_python</span>
@@ -93,11 +97,11 @@
 
 
 <div class="viewcode-block" id="PyextensionsInteractiveConsole.push"><a class="viewcode-back" href="../../modules.html#pyextensions.console.PyextensionsInteractiveConsole.push">[docs]</a>    <span class="k">def</span> <span class="nf">push</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Transform and push a line to the interpreter.</span>
+        <span class="sd">&quot;&quot;&quot;Pushes a transformed line to the interpreter.</span>
 
 <span class="sd">        The line should not have a trailing newline; it may have</span>
-<span class="sd">        internal newlines.  The line is appended to a buffer and the</span>
-<span class="sd">        interpreter&#39;s runsource() method is called with the</span>
+<span class="sd">        internal newlines.  The line is transformed and appended to a buffer.</span>
+<span class="sd">        The interpreter&#39;s runsource() method is called with the</span>
 <span class="sd">        concatenated contents of the buffer as source.  If this</span>
 <span class="sd">        indicates that the command was executed or invalid, the buffer</span>
 <span class="sd">        is reset; otherwise, the command is incomplete, and the buffer</span>
@@ -106,34 +110,30 @@
 <span class="sd">        with in some way (this is the same as runsource()).</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="n">line</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">buffer</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
-
-        <span class="n">source</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">identical</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">do_source_transformations</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+        <span class="n">source</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">buffer</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">identical</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">newsource</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">do_transformations</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">newsource</span> <span class="o">!=</span> <span class="n">source</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">identical</span> <span class="o">=</span> <span class="kc">False</span>
 
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">tree</span> <span class="o">=</span> <span class="n">transforms</span><span class="o">.</span><span class="n">apply_ast_transformations</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
-            <span class="n">source</span> <span class="o">=</span> <span class="n">_unparse</span><span class="p">(</span><span class="n">tree</span><span class="p">)</span>
-        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-            <span class="k">pass</span>
-
-        <span class="n">source</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fix_ending</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">_source</span> <span class="o">=</span> <span class="n">source</span>  <span class="c1"># in case we need it if we want to show a syntax</span>
-        <span class="c1"># error - as we reuse the original method rather</span>
-        <span class="c1"># than rewriting it. See showsyntaxerror() below</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">more</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">runsource</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span>
+            <span class="n">more</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">runsource</span><span class="p">(</span><span class="n">newsource</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">SystemExit</span><span class="p">:</span>
             <span class="n">os</span><span class="o">.</span><span class="n">_exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">more</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">resetbuffer</span><span class="p">()</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">show_python</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">identical</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">show_converted</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">show_converted</span><span class="p">(</span><span class="n">newsource</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">more</span></div>
 
 <div class="viewcode-block" id="PyextensionsInteractiveConsole.show_converted"><a class="viewcode-back" href="../../modules.html#pyextensions.console.PyextensionsInteractiveConsole.show_converted">[docs]</a>    <span class="k">def</span> <span class="nf">show_converted</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Prints the converted source&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">transforms</span><span class="o">.</span><span class="n">AST_TRANSFORMERS</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">ast_transformation_done</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">### Note: AST transformation could not be done.&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;transformers = &quot;</span><span class="p">,</span> <span class="n">transforms</span><span class="o">.</span><span class="n">AST_TRANSFORMERS</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot; ===&quot;</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">source</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">):</span>
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;|&quot;</span><span class="p">,</span> <span class="n">line</span><span class="p">)</span>
@@ -147,39 +147,29 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">show_converted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_source</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">showsyntaxerror</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="n">filename</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="PyextensionsInteractiveConsole.do_source_transformations"><a class="viewcode-back" href="../../modules.html#pyextensions.console.PyextensionsInteractiveConsole.do_source_transformations">[docs]</a>    <span class="k">def</span> <span class="nf">do_source_transformations</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Performs the source transformations on the current content.</span>
+<div class="viewcode-block" id="PyextensionsInteractiveConsole.do_transformations"><a class="viewcode-back" href="../../modules.html#pyextensions.console.PyextensionsInteractiveConsole.do_transformations">[docs]</a>    <span class="k">def</span> <span class="nf">do_transformations</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Performs the source and AST transformations on the current content.</span>
 
-<span class="sd">           Returns the transformed source and a flag indicating if</span>
-<span class="sd">           the transformed source is different from the original source</span>
+<span class="sd">           Returns the transformed source.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># Source transformation may raise an exception</span>
-        <span class="c1"># if a statement ends with a colon, not knowing how to deal with</span>
-        <span class="c1"># To cure this problem, we temporarily add a pass keyword to</span>
-        <span class="c1"># complete such block, removing it after the transformation has</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ast_transformation_done</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">source</span> <span class="o">=</span> <span class="n">transforms</span><span class="o">.</span><span class="n">apply_source_transformations</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">tree</span> <span class="o">=</span> <span class="n">transforms</span><span class="o">.</span><span class="n">apply_ast_transformations</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
+            <span class="n">source</span> <span class="o">=</span> <span class="n">my_unparse</span><span class="p">(</span><span class="n">tree</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ast_transformation_done</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="n">source</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fix_ending</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
 
-        <span class="n">add_pass</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">)</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">):</span>
-            <span class="n">add_pass</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="n">source</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">buffer</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">add_pass</span><span class="p">:</span>
-            <span class="n">source</span> <span class="o">+=</span> <span class="s2">&quot;pass&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_source</span> <span class="o">=</span> <span class="n">source</span>  <span class="c1"># saved in case we need it if we want to show</span>
+        <span class="c1"># a syntax error.See showsyntaxerror() above</span>
+        <span class="k">return</span> <span class="n">source</span></div>
 
-        <span class="n">identical</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="n">newsource</span> <span class="o">=</span> <span class="n">transforms</span><span class="o">.</span><span class="n">apply_source_transformations</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">newsource</span> <span class="o">!=</span> <span class="n">source</span><span class="p">:</span>
-            <span class="n">identical</span> <span class="o">=</span> <span class="kc">False</span>
-
-        <span class="n">source</span> <span class="o">=</span> <span class="n">newsource</span>
-        <span class="k">if</span> <span class="n">add_pass</span><span class="p">:</span>
-            <span class="n">source</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">source</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;pass&quot;</span><span class="p">):</span>
-                <span class="n">source</span> <span class="o">=</span> <span class="n">source</span><span class="p">[:</span><span class="o">-</span><span class="mi">4</span><span class="p">]</span>
-        <span class="k">return</span> <span class="n">source</span><span class="p">,</span> <span class="n">identical</span></div>
 
 <div class="viewcode-block" id="PyextensionsInteractiveConsole.fix_ending"><a class="viewcode-back" href="../../modules.html#pyextensions.console.PyextensionsInteractiveConsole.fix_ending">[docs]</a>    <span class="k">def</span> <span class="nf">fix_ending</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Ensures that the last blank lines of the transformed source are consistent</span>
-<span class="sd">        with what was provided by the user.&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;Ensures that the last blank lines of the transformed source are </span>
+<span class="sd">        consistent with what was provided by the user.&quot;&quot;&quot;</span>
 
         <span class="c1"># Some transformations may add or strip an empty line meant to</span>
         <span class="c1"># end a block, or strip non-empty lines (but with spaces) at the end</span>
@@ -194,19 +184,19 @@
                 <span class="n">blank_lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">break</span>
-
         <span class="n">blank_lines</span> <span class="o">=</span> <span class="nb">reversed</span><span class="p">(</span><span class="n">blank_lines</span><span class="p">)</span>
-        <span class="n">lines</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="n">source</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">source</span><span class="p">:</span>
+            <span class="n">lines</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">lines</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">lines</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">blank_lines</span><span class="p">)</span>
         <span class="n">source</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">source</span></div></div>
 
-
 <span class="k">def</span> <span class="nf">import_transformer</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
     <span class="n">mod</span> <span class="o">=</span> <span class="n">transforms</span><span class="o">.</span><span class="n">import_transformer</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
-    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">mod</span><span class="p">,</span> <span class="s2">&quot;export_to_console&quot;</span><span class="p">):</span>
-        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">mod</span><span class="o">.</span><span class="n">export_to_console</span><span class="p">:</span>
-            <span class="nb">setattr</span><span class="p">(</span><span class="n">builtins</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">mod</span><span class="o">.</span><span class="n">export_to_console</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
     <span class="k">return</span> <span class="n">mod</span>
 
 

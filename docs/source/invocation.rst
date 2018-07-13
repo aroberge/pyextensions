@@ -8,8 +8,6 @@ Invocation
 
     Proceed with caution.
 
-pyextension's 
------------------------------
 .. automodule:: pyextensions
    :members:
 

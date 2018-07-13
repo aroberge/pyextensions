@@ -1,6 +1,23 @@
-''' repeat_keyword2 is almost identical to repeat_keyword except that
-it converts the argument of range() into an int, thus making it compatible
-with fractional_arithmetic.
+''' repeat_keyword is a transformation that introduces `repeat` as a keyword 
+to write simple loops that repeat a set number of times.  That is:
+
+    repeat 3:
+        a = 2
+        repeat a*a:
+            pass
+
+is equivalent to
+
+    for __VAR_1 in range(3):
+        a = 2
+        for __VAR_2 in range(a*a):
+            pass
+
+The names of the variables are chosen so as to ensure that they
+do not appear in the source code to be translated.
+
+The transformation is done using the tokenize module; it should
+only affect code and not content of strings.
 '''
 
 from io import StringIO
@@ -13,7 +30,7 @@ def transform_source(text):
         repeat n:
     by
 
-        for __VAR_i in range(int(n)):
+        for __VAR_i in range(n):
 
     where __VAR_i is a string that does not appear elsewhere
     in the code sample.
@@ -29,26 +46,24 @@ def transform_source(text):
 
     toks = tokenize.generate_tokens(StringIO(text).readline)
     result = []
-    replacing_keyword = False
-    for toktype, tokvalue, _, _, _ in toks:
+    replacing_keyword = []
+    for toktype, tokvalue, start, _, _ in toks:
         if toktype == tokenize.NAME and tokvalue == loop_keyword:
             result.extend([
                 (tokenize.NAME, 'for'),
                 (tokenize.NAME, var_names.pop()),
                 (tokenize.NAME, 'in'),
                 (tokenize.NAME, 'range'),
-                (tokenize.OP, '('),
-                (tokenize.NAME, 'int'),
                 (tokenize.OP, '(')
             ])
-            replacing_keyword = True
+            replacing_keyword.append(start[0])
         elif replacing_keyword and tokvalue == ':':
+            if start[0] != replacing_keyword.pop():
+                raise SyntaxError("colon and 'repeat' must be on same line")
             result.extend([
-                (tokenize.OP, ')'),
                 (tokenize.OP, ')'),
                 (tokenize.OP, ':')
             ])
-            replacing_keyword = False
         else:
             result.append((toktype, tokvalue))
     return tokenize.untokenize(result)

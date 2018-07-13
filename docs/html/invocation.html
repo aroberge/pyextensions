@@ -68,10 +68,8 @@
 of the module&#8217;s <code class="docutils literal"><span class="pre">__init__.py</span></code> and was possibly accurate at some point in the past.</p>
 <p class="last">Proceed with caution.</p>
 </div>
-<div class="section" id="module-pyextensions">
-<span id="pyextension-s"></span><h2>pyextension&#8217;s<a class="headerlink" href="#module-pyextensions" title="Permalink to this headline">¶</a></h2>
-<p>pyextensions sets up an import hook which
-makes it possible to run a file that contains modified Python syntax
+<span class="target" id="module-pyextensions"></span><p>pyextensions sets up an import hook which
+makes it possible to run a file that contains modified Python syntax,
 provided the relevant source transformers can be imported.</p>
 <div class="admonition warning">
 <p class="first admonition-title">Warning</p>
@@ -89,7 +87,7 @@ two alternatives:</p>
 long form. In what follows we always show both alternatives.</p>
 </div>
 <div class="section" id="basic-invocation">
-<h3>Basic invocation<a class="headerlink" href="#basic-invocation" title="Permalink to this headline">¶</a></h3>
+<h2>Basic invocation<a class="headerlink" href="#basic-invocation" title="Permalink to this headline">¶</a></h2>
 <p>The primary role of pyextensions is to run programs that have a modified syntax.
 This is done by one of the two following alternatives:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">pyextensions</span> <span class="o">-</span><span class="n">s</span> <span class="n">name</span>
@@ -108,6 +106,9 @@ Normal Python files will bypass the transformations.</p>
 </div>
 <p>Note that you really should not choose &#8220;py&#8221; and most definitely not &#8220;pyc&#8221; 
 as the file extension for files to be processed by <code class="docutils literal"><span class="pre">pyextensions</span></code>.</p>
+</div>
+<div class="section" id="additional-utilities">
+<h2>Additional utilities<a class="headerlink" href="#additional-utilities" title="Permalink to this headline">¶</a></h2>
 <p>If you want to view how pyextensions transformed an input file,
 you can use the <code class="docutils literal"><span class="pre">-d</span></code> or <code class="docutils literal"><span class="pre">--diff</span></code> option:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">pyextensions</span> <span class="o">-</span><span class="n">s</span> <span class="n">name</span> <span class="o">-</span><span class="n">d</span>
@@ -118,9 +119,39 @@ you can use the <code class="docutils literal"><span class="pre">-d</span></code
 file named <code class="docutils literal"><span class="pre">name.html</span></code> in the current directory.</p>
 <div class="admonition-todo admonition" id="index-0">
 <p class="first admonition-title">Todo</p>
-<p class="last">Add info about <code class="docutils literal"><span class="pre">--convert</span></code> and about the console.
-Also add info about the transformers.</p>
+<ul class="last simple">
+<li>document <code class="docutils literal"><span class="pre">-c</span></code> (<code class="docutils literal"><span class="pre">--convert</span></code>)</li>
+<li>Implement <code class="docutils literal"><span class="pre">-o</span> <span class="pre">[filename]</span></code> (<code class="docutils literal"><span class="pre">--output</span></code>) and document</li>
+</ul>
 </div>
+</div>
+<div class="section" id="quirky-console">
+<h2>Quirky console<a class="headerlink" href="#quirky-console" title="Permalink to this headline">¶</a></h2>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Python&#8217;s interpreter console (REPL) is a useful tool for quick demos
+and code explorations. pyextensions includes a console which works
+reasonably well in most situations but can fail unexpectedly.
+To understand why, please console the documentation.</p>
+</div>
+<p>The simplest way to invoke pyextension&#8217;s console is as follows:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">pyextensions</span>
+</pre></div>
+</div>
+<div class="admonition-todo admonition" id="index-1">
+<p class="first admonition-title">Todo</p>
+<ul class="last simple">
+<li>document <code class="docutils literal"><span class="pre">-c</span></code> when using the console</li>
+<li>document <code class="docutils literal"><span class="pre">-d</span></code> when using the console</li>
+<li>document <code class="docutils literal"><span class="pre">-t</span></code> when using the console</li>
+</ul>
+</div>
+</div>
+<div class="section" id="python-s-interactive-mode">
+<h2>Python&#8217;s interactive mode<a class="headerlink" href="#python-s-interactive-mode" title="Permalink to this headline">¶</a></h2>
+<p>..todo:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Document</span> <span class="n">Python</span><span class="s1">&#39;s ``-i`` flag (interactive mode)</span>
+</pre></div>
 </div>
 </div>
 </div>
@@ -134,10 +165,10 @@ Also add info about the transformers.</p>
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Invocation</a><ul>
-<li><a class="reference internal" href="#module-pyextensions">pyextension&#8217;s</a><ul>
 <li><a class="reference internal" href="#basic-invocation">Basic invocation</a></li>
-</ul>
-</li>
+<li><a class="reference internal" href="#additional-utilities">Additional utilities</a></li>
+<li><a class="reference internal" href="#quirky-console">Quirky console</a></li>
+<li><a class="reference internal" href="#python-s-interactive-mode">Python&#8217;s interactive mode</a></li>
 </ul>
 </li>
 </ul>
@@ -151,7 +182,7 @@ Also add info about the transformers.</p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
-      <li><a href="_sources/invoque.rst.txt"
+      <li><a href="_sources/invocation.rst.txt"
             rel="nofollow">Show Source</a></li>
     </ul>
    </div>

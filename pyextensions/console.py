@@ -58,7 +58,13 @@ class PyextensionsInteractiveConsole(code.InteractiveConsole):
         self.buffer.append(line)
         source = "\n".join(self.buffer)
         self.identical = True
-        newsource = self.do_transformations(source)
+        try:
+            newsource = self.do_transformations(source)
+        except SystemExit:
+            os._exit(1)
+        except Exception as e:
+            self.showsyntaxerror(filename='console')
+            
         if newsource != source:
             self.identical = False
 
@@ -97,7 +103,10 @@ class PyextensionsInteractiveConsole(code.InteractiveConsole):
            Returns the transformed source.
         """
         self.ast_transformation_done = False
-        source = transforms.apply_source_transformations(source)
+        try:
+            source = transforms.apply_source_transformations(source)
+        except Exception:
+            pass
         try:
             tree = transforms.apply_ast_transformations(source)
             source = my_unparse(tree)

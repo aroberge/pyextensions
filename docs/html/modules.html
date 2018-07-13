@@ -141,11 +141,13 @@ and adds them to the globally known dict</p>
 <dl class="function">
 <dt id="pyextensions.transforms.apply_ast_transformations">
 <code class="descclassname">pyextensions.transforms.</code><code class="descname">apply_ast_transformations</code><span class="sig-paren">(</span><em>source</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyextensions/transforms.html#apply_ast_transformations"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyextensions.transforms.apply_ast_transformations" title="Permalink to this definition">¶</a></dt>
-<dd><p>Used to convert the source code, making use of known transformers.</p>
-<p>&#8220;transformers&#8221; are modules which must contain a function</p>
+<dd><p>Used to convert the source code into an AST tree and applying
+all AST transformer specified in the source code. It returns
+a (potentially transformed) AST tree.</p>
+<p>&#8220;AST transformers&#8221; are modules which must contain a function</p>
 <blockquote>
 <div>transform_ast(tree)</div></blockquote>
-<p>which returns a tranformed ast.</p>
+<p>which return another AST tree.</p>
 </dd></dl>
 
 <dl class="function">
@@ -190,30 +192,32 @@ custom method.</p>
 <dl class="class">
 <dt id="pyextensions.console.PyextensionsInteractiveConsole">
 <em class="property">class </em><code class="descclassname">pyextensions.console.</code><code class="descname">PyextensionsInteractiveConsole</code><span class="sig-paren">(</span><em>locals=None</em>, <em>show_python=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyextensions/console.html#PyextensionsInteractiveConsole"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyextensions.console.PyextensionsInteractiveConsole" title="Permalink to this definition">¶</a></dt>
-<dd><p>A Python console that emulates the normal Python interpreter
-except that it support experimental code transformations.</p>
+<dd><p>A Python console that tries to emulate the normal Python interpreter
+except that it support experimental code transformations.
+It inherits from cPython&#8217;s <code class="docutils literal"><span class="pre">code.InteractiveConsole</span></code>.</p>
+<p>Like the normal Python&#8217;s interactive console, it attempts to evaluate
+code entered one line at a time by a user.</p>
 <dl class="method">
-<dt id="pyextensions.console.PyextensionsInteractiveConsole.do_source_transformations">
-<code class="descname">do_source_transformations</code><span class="sig-paren">(</span><em>line</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyextensions/console.html#PyextensionsInteractiveConsole.do_source_transformations"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyextensions.console.PyextensionsInteractiveConsole.do_source_transformations" title="Permalink to this definition">¶</a></dt>
-<dd><p>Performs the source transformations on the current content.</p>
-<p>Returns the transformed source and a flag indicating if
-the transformed source is different from the original source</p>
+<dt id="pyextensions.console.PyextensionsInteractiveConsole.do_transformations">
+<code class="descname">do_transformations</code><span class="sig-paren">(</span><em>source</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyextensions/console.html#PyextensionsInteractiveConsole.do_transformations"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyextensions.console.PyextensionsInteractiveConsole.do_transformations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs the source and AST transformations on the current content.</p>
+<p>Returns the transformed source.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="pyextensions.console.PyextensionsInteractiveConsole.fix_ending">
 <code class="descname">fix_ending</code><span class="sig-paren">(</span><em>source</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyextensions/console.html#PyextensionsInteractiveConsole.fix_ending"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyextensions.console.PyextensionsInteractiveConsole.fix_ending" title="Permalink to this definition">¶</a></dt>
-<dd><p>Ensures that the last blank lines of the transformed source are consistent
-with what was provided by the user.</p>
+<dd><p>Ensures that the last blank lines of the transformed source are 
+consistent with what was provided by the user.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="pyextensions.console.PyextensionsInteractiveConsole.push">
 <code class="descname">push</code><span class="sig-paren">(</span><em>line</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyextensions/console.html#PyextensionsInteractiveConsole.push"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyextensions.console.PyextensionsInteractiveConsole.push" title="Permalink to this definition">¶</a></dt>
-<dd><p>Transform and push a line to the interpreter.</p>
+<dd><p>Pushes a transformed line to the interpreter.</p>
 <p>The line should not have a trailing newline; it may have
-internal newlines.  The line is appended to a buffer and the
-interpreter&#8217;s runsource() method is called with the
+internal newlines.  The line is transformed and appended to a buffer.
+The interpreter&#8217;s runsource() method is called with the
 concatenated contents of the buffer as source.  If this
 indicates that the command was executed or invalid, the buffer
 is reset; otherwise, the command is incomplete, and the buffer
