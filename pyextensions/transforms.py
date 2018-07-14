@@ -3,17 +3,10 @@ code transformers. It also contains a function, `transform`, which
 takes care of invoking all known transformers to convert a source code.
 """
 import ast
-import io
 import sys
 
 from . import config
-from . import unparse
-
-
-def my_unparse(tree):
-    v = io.StringIO()
-    unparse.Unparser(tree, file=v)
-    return v.getvalue()
+from .unparse import my_unparse
 
 
 class NullTransformer:

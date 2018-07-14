@@ -1,4 +1,5 @@
-# Copied from CPython's  Tools/parser directory
+# Except for my_unparse, all of the content was copied from CPython's
+# Tools/parser directory
 
 "Usage: unparse.py <path to source file>"
 import sys
@@ -6,6 +7,13 @@ import ast
 import tokenize
 import io
 import os
+
+
+def my_unparse(tree):
+    """quick and easy unparsing function"""
+    v = io.StringIO()
+    Unparser(tree, file=v)
+    return v.getvalue()
 
 # Large float and imaginary literals get turned into infinities in the AST.
 # We unparse those infinities to INFSTR.

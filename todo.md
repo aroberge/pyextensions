@@ -3,9 +3,9 @@
 ## IMPORTANT
 
 - [ ] Fix traceback in console so that correct syntax error is picked up.
-- [ ] Implement proper repeat handling transformation with limitations on syntax allowed for repeat loop
+- [x] Implement proper repeat handling transformation with limitations on syntax allowed for repeat loop
 - [ ] Consider implementing "simplified Python" (Snakelet?) with repeat loops and limited syntax e.g. all paren or brackets must close on a single line; no semi-colon allowed as tokens, etc.
-- [ ] Consider implementing a "simplfied French Python" (Serpenteau?)
+- [ ] Consider implementing a "simplified French Python" (Serpenteau?)
 - [ ] Implement an excepthook to provide simplified tracebacks - perhaps with a French translation.
 
 Note: do not use gettext. Too complicated for this project.
@@ -28,4 +28,5 @@ Note: do not use gettext. Too complicated for this project.
 - [X] create sphinx doc 
 - [X] show on github pages
 - [ ] add color option (warning, errors, transformed, foreground, background?) Perhaps have dedicated printing functions like print_error, print_warning, print_normal, print_transformed
+- [ ] review https://www.python.org/doc/essays/cp4e/
 

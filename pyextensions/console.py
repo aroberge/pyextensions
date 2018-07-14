@@ -1,4 +1,3 @@
-import io
 import code
 import platform
 import os
@@ -7,13 +6,6 @@ import sys
 from . import config
 from . import transforms
 from . import version
-from . import unparse
-
-
-def my_unparse(tree):
-    v = io.StringIO()
-    unparse.Unparser(tree, file=v)
-    return v.getvalue()
 
 
 # define banner and prompt here so that they can be imported in tests
@@ -106,8 +98,7 @@ class PyextensionsInteractiveConsole(code.InteractiveConsole):
         except Exception:
             pass
         try:
-            tree = transforms.apply_ast_transformations(source)
-            source = my_unparse(tree)
+            source = transforms.apply_ast_transformations(source)
             self.ast_transformation_done = True
         except Exception:
             pass

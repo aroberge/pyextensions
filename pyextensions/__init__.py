@@ -82,7 +82,7 @@ The simplest way to invoke pyextension's console is as follows::
 Python's interactive mode
 -------------------------
 
-..todo::
+.. todo::
 
     Document Python's ``-i`` flag (interactive mode)
 

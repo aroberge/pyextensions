@@ -152,3 +152,7 @@ https://mail.python.org/pipermail/python-ideas/2015-May/033570.html
 ## other
 
 tail call optimization https://eli.thegreenplace.net/2017/on-recursion-continuations-and-trampolines/
+
+about keywords for loops
+http://neverworkintheory.org/2014/01/29/stefik-siebert-syntax.html
+http://sci-hub.tw/10.1145/2534973
