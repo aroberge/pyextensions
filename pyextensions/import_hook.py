@@ -8,14 +8,8 @@ import importlib
 from importlib.abc import Loader, MetaPathFinder
 from importlib.util import spec_from_file_location
 
+from . import config
 from . import transforms
-
-# The following global variables can be changed (or used) in __init__.py
-# based on command line options
-MAIN_MODULE_NAME = None
-FILE_EXT = "notpy"
-CONVERT = False
-DIFF = False
 
 
 def import_main(name):
@@ -30,8 +24,7 @@ def import_main(name):
        Python identifies pyextensions as the main script; we artificially
        change this so that "main_script" is properly identified as ``name``.
     """
-    global MAIN_MODULE_NAME
-    MAIN_MODULE_NAME = name
+    config.MAIN_MODULE_NAME = name
     return importlib.import_module(name)
 
 
@@ -55,7 +48,7 @@ class ExtensionMetaFinder(MetaPathFinder):
                 filename = os.path.join(entry, name, "__init__.py")
                 submodule_locations = [os.path.join(entry, name)]
             else:
-                filename = os.path.join(entry, name + "." + FILE_EXT)
+                filename = os.path.join(entry, name + "." + config.FILE_EXT)
                 submodule_locations = None
 
             if not os.path.exists(filename):
@@ -82,35 +75,34 @@ class ExtensionLoader(Loader):
     def exec_module(self, module):
         """import the source code, transforma it before executing it so that
            it is known to Python."""
-        global MAIN_MODULE_NAME
 
-        if not self.filename.endswith(FILE_EXT) and not self.filename.endswith(
+        if not self.filename.endswith(config.FILE_EXT) and not self.filename.endswith(
             "__init__.py"
         ):
             print("Fatal error: ExtensionLoader is asked to load a normal file.")
             print("filename:", self.filename)
-            print("Expected extension:", FILE_EXT)
+            print("Expected extension:", config.FILE_EXT)
             raise SystemExit
 
         name = module.__name__
-        if module.__name__ == MAIN_MODULE_NAME:
+        if module.__name__ == config.MAIN_MODULE_NAME:
             module.__name__ = "__main__"
-            MAIN_MODULE_NAME = None
+            config.MAIN_MODULE_NAME = None
 
         with open(self.filename) as f:
             source = f.read()
 
         transforms.identify_requested_transformers(source)
 
-        if transforms.TRANSFORMERS:
+        if config.TRANSFORMERS:
             original = source
             source = transforms.add_all_imports(source)
             source = transforms.apply_source_transformations(source)
 
-            if DIFF and original != source:
+            if config.DIFF and original != source:
                 self.write_html_diff(name, original, source)
 
-        if CONVERT and self.filename.endswith(FILE_EXT):
+        if config.CONVERT and self.filename.endswith(config.FILE_EXT):
             print("############### Original source: ############\n")
             print(original)
             print("\n############### Converted source: ############\n")
@@ -118,7 +110,6 @@ class ExtensionLoader(Loader):
             print("=" * 50, "\n")
 
         source = transforms.apply_ast_transformations(source)
-        # co = compile(tree, module.__name__, "exec")
         exec(source, vars(module))
 
     def write_html_diff(self, name, original, transformed):
@@ -129,7 +120,7 @@ class ExtensionLoader(Loader):
         tolines = transformed.split("\n")
 
         diff = difflib.HtmlDiff().make_file(
-            fromlines, tolines, name + "." + FILE_EXT, name + ".py"
+            fromlines, tolines, name + "." + config.FILE_EXT, name + ".py"
         )
         with open(html, "w") as the_file:
             the_file.write(diff)

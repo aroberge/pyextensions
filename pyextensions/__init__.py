@@ -37,7 +37,7 @@ A different extension that ``notpy`` can be specified as follows::
     python -m pyextensions -s name -x EXTENSION
     python -m pyextensions -s name --file_extension EXTENSION
 
-Note that you really should not choose "py" and most definitely not "pyc" 
+Note that you really should not choose "py" and most definitely not "pyc"
 as the file extension for files to be processed by ``pyextensions``.
 
 Additional utilities
@@ -74,7 +74,7 @@ The simplest way to invoke pyextension's console is as follows::
 
 
 .. todo::
-    
+
     * document ``-c`` when using the console
     * document ``-d`` when using the console
     * document ``-t`` when using the console
@@ -90,7 +90,11 @@ Python's interactive mode
 import argparse
 import sys
 import os.path
-from . import console, import_hook, transforms
+
+from . import config
+from . import console
+from . import import_hook
+from . import transforms
 
 start_console = console.start_console
 
@@ -121,7 +125,7 @@ if "-m" in sys.argv:
     parser.add_argument(
         "-s",
         "--source",
-        help="""Source file to be transformed. 
+        help="""Source file to be transformed.
                 Format: path.to.file -- Do not include an extension.""",
     )
     parser.add_argument(
@@ -140,7 +144,7 @@ if "-m" in sys.argv:
     parser.add_argument(
         "-d",
         "--diff",
-        help="""Creates an html file containing a showing 
+        help="""Creates an html file containing a showing
                 how the original source differs from the transformed one.""",
         action="store_true",
     )
@@ -156,15 +160,15 @@ if "-m" in sys.argv:
 
     if args.convert:
         show_python = True
-        import_hook.CONVERT = True
+        config.CONVERT = True
     else:
         show_python = False
 
     if args.diff:
-        import_hook.DIFF = True
+        config.DIFF = True
 
     if args.file_extension is not None:
-        import_hook.FILE_EXT = args.file_extension
+        config.FILE_EXT = args.file_extension
 
     if args.source is not None:
         try:

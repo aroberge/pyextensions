@@ -6,7 +6,9 @@ import ast
 import io
 import sys
 
+from . import config
 from . import unparse
+
 
 def my_unparse(tree):
     v = io.StringIO()
@@ -20,9 +22,6 @@ class NullTransformer:
 
     def transform_source(self, source):
         return source
-
-TRANSFORMERS = {}
-AST_TRANSFORMERS = []
 
 
 def add_transformers(line):
@@ -45,11 +44,11 @@ def import_transformer(name):
        do its job - which is faster and likely more reliable than our
        custom method.
     """
-    if name in TRANSFORMERS:
-        if not name in AST_TRANSFORMERS:
-            if hasattr(TRANSFORMERS[name], 'transform_ast'):
-                AST_TRANSFORMERS.append(name)
-        return TRANSFORMERS[name]
+    if name in config.TRANSFORMERS:
+        if name not in config.AST_TRANSFORMERS:
+            if hasattr(config.TRANSFORMERS[name], "transform_ast"):
+                config.AST_TRANSFORMERS.append(name)
+        return config.TRANSFORMERS[name]
 
     # We are adding a transformer built from normal/standard Python code.
     # As we are not performing transformations, we temporarily disable
@@ -58,18 +57,18 @@ def import_transformer(name):
     hook = sys.meta_path[0]
     sys.meta_path = sys.meta_path[1:]
     try:
-        TRANSFORMERS[name] = __import__(name)
+        config.TRANSFORMERS[name] = __import__(name)
         # Some transformers are not allowed in the console.
         # If an attempt is made to activate one of them in the console,
         # we replace it by a transformer that does nothing and print a
-    # message specific to that transformer as written in its module.
-        if hasattr(TRANSFORMERS[name], 'transform_ast'):
-            AST_TRANSFORMERS.append(name)
+        # message specific to that transformer as written in its module.
+        if hasattr(config.TRANSFORMERS[name], "transform_ast"):
+            config.AST_TRANSFORMERS.append(name)
     except ImportError:
         sys.stderr.write(
             "Warning: Import Error in add_transformers: %s not found\n" % name
         )
-        TRANSFORMERS[name] = NullTransformer()
+        config.TRANSFORMERS[name] = NullTransformer()
     except Exception as e:
         sys.stderr.write(
             "\nUnexpected exception in transforms.import_transformer %s\n "
@@ -80,7 +79,7 @@ def import_transformer(name):
     finally:
         sys.meta_path.insert(0, hook)  # restore import hook
 
-    return TRANSFORMERS[name]
+    return config.TRANSFORMERS[name]
 
 
 def identify_requested_transformers(source):
@@ -92,13 +91,12 @@ def identify_requested_transformers(source):
     identifying transformers to be used and ensure that they are imported.
     """
     lines = source.split("\n")
-    linenumbers = []
     clear = False
     for number, line in enumerate(lines):
         if line.startswith("#ext "):
             if not clear:
-                TRANSFORMERS.clear()
-                AST_TRANSFORMERS.clear()
+                config.TRANSFORMERS.clear()
+                config.AST_TRANSFORMERS.clear()
                 clear = True
             add_transformers(line)
     return None
@@ -108,13 +106,12 @@ def add_all_imports(source):
     """Some transformers may require that other modules be imported
     in the source code for it to work properly.
     """
-    for name in TRANSFORMERS:
+    for name in config.TRANSFORMERS:
         tr_module = import_transformer(name)
-        if hasattr(tr_module, 'add_import'):
+        if hasattr(tr_module, "add_import"):
             source = tr_module.add_import() + source
 
     return source
-
 
 
 def apply_source_transformations(source):
@@ -134,13 +131,13 @@ def apply_source_transformations(source):
     # Some transformer fail when multiple non-Python constructs
     # are present. So, we loop multiple times keeping track of
     # which transformations have been unsuccessfully performed.
-    not_done = TRANSFORMERS
+    not_done = config.TRANSFORMERS
     first_exception = None
     while True:
         failed = {}
         for name in not_done:
             tr_module = import_transformer(name)
-            if hasattr(tr_module, 'transform_source'):
+            if hasattr(tr_module, "transform_source"):
                 try:
                     source = tr_module.transform_source(source)
                 except Exception as e:
@@ -175,11 +172,11 @@ def apply_ast_transformations(source):
 
        which return another AST tree.
     """
-    if not AST_TRANSFORMERS:
+    if not config.AST_TRANSFORMERS:
         return source
     tree = ast.parse(source)
-    for name in AST_TRANSFORMERS:
-        tr_module = TRANSFORMERS[name]
+    for name in config.AST_TRANSFORMERS:
+        tr_module = config.TRANSFORMERS[name]
         try:
             tree = tr_module.transform_ast(tree)
         except Exception as e:

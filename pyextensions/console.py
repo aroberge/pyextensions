@@ -1,14 +1,14 @@
-import ast
-import builtins
 import io
 import code
 import platform
 import os
 import sys
 
+from . import config
 from . import transforms
 from . import version
 from . import unparse
+
 
 def my_unparse(tree):
     v = io.StringIO()
@@ -39,7 +39,6 @@ class PyextensionsInteractiveConsole(code.InteractiveConsole):
         for line in source:
             self.push(line)
 
-
     def push(self, line):
         """Pushes a transformed line to the interpreter.
 
@@ -52,7 +51,6 @@ class PyextensionsInteractiveConsole(code.InteractiveConsole):
         is left as it was after the line was appended.  The return
         value is 1 if more input is required, 0 if the line was dealt
         with in some way (this is the same as runsource()).
-
         """
         assert not line.endswith("\n")
         self.buffer.append(line)
@@ -63,8 +61,8 @@ class PyextensionsInteractiveConsole(code.InteractiveConsole):
         except SystemExit:
             os._exit(1)
         except Exception as e:
-            self.showsyntaxerror(filename='console')
-            
+            self.showsyntaxerror(filename="console")
+
         if newsource != source:
             self.identical = False
 
@@ -81,17 +79,17 @@ class PyextensionsInteractiveConsole(code.InteractiveConsole):
 
     def show_converted(self, source):
         """Prints the converted source"""
-        if transforms.AST_TRANSFORMERS and not self.ast_transformation_done:
+        if config.AST_TRANSFORMERS and not self.ast_transformation_done:
             print("\n### Note: AST transformation could not be done.")
-            print("transformers = ", transforms.AST_TRANSFORMERS, "\n")
+            print("transformers = ", config.AST_TRANSFORMERS, "\n")
         print(" ===")
         for line in source.split("\n"):
             print("|", line)
         print(" ===")
-        self.identical = True # prevent from showing again
+        self.identical = True  # prevent from showing again
 
     def showsyntaxerror(self, filename=None):
-        """Shows the converted source if different than the original 
+        """Shows the converted source if different than the original
            and the syntax error"""
         if not self.identical:
             self.show_converted(self._source)
@@ -119,9 +117,8 @@ class PyextensionsInteractiveConsole(code.InteractiveConsole):
         # a syntax error.See showsyntaxerror() above
         return source
 
-
     def fix_ending(self, source):
-        """Ensures that the last blank lines of the transformed source are 
+        """Ensures that the last blank lines of the transformed source are
         consistent with what was provided by the user."""
 
         # Some transformations may add or strip an empty line meant to
@@ -147,6 +144,7 @@ class PyextensionsInteractiveConsole(code.InteractiveConsole):
         lines.extend(blank_lines)
         source = "\n".join(lines)
         return source
+
 
 def import_transformer(name):
     mod = transforms.import_transformer(name)
