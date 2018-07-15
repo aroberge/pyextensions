@@ -5,6 +5,17 @@
     repeat until  -> while not
     repeat while -> while
 
+.. todo::
+
+    Right now, () are required for repeat (n). It might be worth looking at
+    treating this case last, removing the requirements to put in () and, instead
+    do something like::
+
+        repeat expr :->
+
+        assert isinstance(eval("expr"), int), "repeat must be followed by an integer"
+        for var in range(expr):
+
 """
 
 from io import StringIO

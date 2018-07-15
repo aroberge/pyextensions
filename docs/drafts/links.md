@@ -20,9 +20,15 @@ Extensibility of various languages https://softwareengineering.stackexchange.com
 
 https://github.com/samrushing/cps-python/
 
+https://mail.python.org/pipermail/python-ideas/2016-January/038140.html
+
 Rejected PEP (by its author): https://www.python.org/dev/peps/pep-0511/
 
 Need to read https://mail.python.org/pipermail/python-ideas/2016-January/037892.html
+
+"I think something that isn't made clear in the rationale is why an import hook is good enough for most semantic extensions, but isn't good enough for global optimizers."  https://mail.python.org/pipermail/python-ideas/2016-January/037908.html 
+
+https://mail.python.org/pipermail/python-ideas/2016-February/038450.html refers to where one might learn about implementing bytecodes.
 
 ## Blog posts
 
