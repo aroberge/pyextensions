@@ -13,6 +13,7 @@
    """
 import ast
 
+
 class FractionWrapper(ast.NodeTransformer):
     """Wraps all integers in a call to Integer()"""
     def visit_Num(self, node):
@@ -21,11 +22,16 @@ class FractionWrapper(ast.NodeTransformer):
                             args=[node], keywords=[])
         return node
 
+
 def transform_ast(tree):
-    import sys
     tree = FractionWrapper().visit(tree)
     ast.fix_missing_locations(tree)
     return tree
+
+
+def transform_source(source):
+    return add_import() + source
+
 
 def add_import():
     return "from fractions import Fraction\n"

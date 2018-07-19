@@ -22,8 +22,9 @@ so far to implement this.
 
 In addition to the above, we have found that some transformations would require
 that the module to be transformed and executed should also import some
-additional modules.  If a transformer needs this, it needs to include another
-function named ``add_import``.
+additional modules.  While this could be done using the ``transform_source()``
+function to simply prepend the required imports in the transformed source,
+we have found it useful to do this using another function named ``add_import``.
 
 Modules to be transformed should not have a ".py" extension. By default,
 this module looks for files ending with a ".notpy" extension; however, this
@@ -31,7 +32,6 @@ can be changed as described below.
 """
 import argparse
 import ast
-import difflib
 import os.path
 import sys
 
@@ -58,16 +58,17 @@ def create_fake_site_packages_dir():
 
 create_fake_site_packages_dir()
 
-# umparse, copied from the CPython's Tools directory, has been slightly
-# modified to add a single function, my_unparse, and put in the fake_site_pkg
-from unparse import my_unparse  # noqa
-
+# The import hook utility provided by pyextensions can be used in
+# interactive mode, given a specifically crafted REPL.
+# Through experimentation, we have found that transformers need to behave
+# slightly differently depending on the context and thus need to be aware
+# of the context in which they are called.
+# CONFIG["interactive"] plays that role as a global variable,
+# accessible both to the REPL and the various transformers.
 CONFIG = {
+    "interactive": False,  # Not used explicitly in this module.
     "file_ext": "notpy",
-    "convert": False,
-    "diff": False,
     "main_module_name": None,
-    "output": False,
     "version": 0.2,
 }
 TRANSFORMERS = {"<cache>": []}  # [(tr_name1, tr_mod1), ...]
@@ -138,44 +139,11 @@ class ExtensionLoader(Loader):
         get_required_transformers(module_name, source)
 
         if TRANSFORMERS[module_name]:
-            original = source
-            source = add_all_imports(module_name, source)
             source = apply_source_transformations(module_name, source)
-
-            if CONFIG["diff"] and original != source:
-                self.write_html_diff(module_name, original, source)
-
-            if CONFIG["convert"]:
-                print("\n############### Converted source ############\n")
-                print(source)
-                print("=" * 50, "\n")
-
-            if CONFIG["output"]:
-                self.write(module_name, source)
-
-            source = apply_ast_transformations(module_name, source)
-        exec(source, vars(module))
-
-    def write_html_diff(self, module_name, original, transformed):
-        """Writes an html file showing the difference between the original
-           and the transformed source."""
-        notpy = module_name + "." + CONFIG["file_ext"]
-        html = notpy + ".html"
-        py = notpy + ".py"
-        fromlines = original.split("\n")
-        tolines = transformed.split("\n")
-
-        diff = difflib.HtmlDiff().make_file(fromlines, tolines, notpy, py)
-        with open(html, "w") as the_file:
-            the_file.write(diff)
-        print("Diff file writen to", html)
-
-    def write_converted(self, module_name, source):
-        """Writes the converted source into a file."""
-        py = module_name + "." + CONFIG["file_ext"] + ".py"
-        with open(py, "w") as the_file:
-            the_file.write(source)
-        print("Converted file writen to", py)
+            tree = ast.parse(source)
+            tree = apply_ast_transformations(module_name, tree)
+            co = compile(tree, module_name, "exec")
+            exec(co, vars(module))
 
 
 def import_main(module_name):
@@ -270,20 +238,6 @@ def import_transformer(module_name, trans_name):
 # What follows is the code required for doing the actual transformations.
 ############
 
-
-def add_all_imports(module_name, source):
-    """Some transformers may require that other modules be imported
-    in the source code for it to work properly.
-    """
-    if module_name not in TRANSFORMERS:
-        return source
-
-    for _, transformer in TRANSFORMERS[module_name]:
-        if hasattr(transformer, "add_import"):
-            source = transformer.add_import() + source
-    return source
-
-
 def apply_source_transformations(module_name, source):
     """Used to convert the source code, applying all the transformers
        specified in the module, in the order specified.
@@ -300,7 +254,7 @@ def apply_source_transformations(module_name, source):
     return source
 
 
-def apply_ast_transformations(module_name, source):
+def apply_ast_transformations(module_name, tree):
     """Used to convert the code by applying AST transformations,
        applying all the transformers specified in the module,
        in the order specified.
@@ -313,11 +267,10 @@ def apply_ast_transformations(module_name, source):
     if module_name not in TRANSFORMERS:
         return source
 
-    tree = ast.parse(source)
     for trans_name, transformer in TRANSFORMERS[module_name]:
         if hasattr(transformer, "transform_ast"):
             tree = transformer.transform_ast(tree)
-    return my_unparse(tree)
+    return tree
 
 
 def main():
@@ -341,27 +294,7 @@ def main():
 
         python -m pyextensions -s name -x EXTENSION
         or --file_extension EXTENSION
-
-    Note that you probaly should  not choose ``py`` and most definitely not
-    ``pyc`` as the file extension for files to be processed by ``pyextensions``.
-
-    **Additional utilities**
-
-    If you want to view how pyextensions transformed an input file,
-    you can use the ``-d`` or ``--diff`` option::
-
-        python -m pyextensions -s name -d
-        or ... name --diff
-
-    This will use Python's ``difflib`` module and write the result in a
-    file named ``name.notpy.html`` in the current directory. The only changes
-    that are source transformations, and not AST (or bytecode) transformations.
-
-    .. todo::
-
-       * document ``-c`` (``--convert``)
-       * Implement ``-o`` (``--output``)
-"""
+    """
     parser = argparse.ArgumentParser(
         description="""
         pyextensions sets up an import hook which
@@ -388,21 +321,7 @@ def main():
         action="store_true",
     )
 
-    parser.add_argument(
-        "-d",
-        "--diff",
-        help="""Creates an html file containing a showing
-                how the original source differs from the transformed one.""",
-        action="store_true",
-    )
-
     args = parser.parse_args()
-
-    if args.convert:
-        CONFIG["convert"] = True
-
-    if args.diff:
-        CONFIG["diff"] = True
 
     if args.file_extension is not None:
         CONFIG["file_ext"] = args.file_extension

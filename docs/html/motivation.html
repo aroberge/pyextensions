@@ -27,7 +27,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Modules" href="modules.html" />
-    <link rel="prev" title="Invocation" href="invoque.html" />
+    <link rel="prev" title="Invocation" href="invocation.html" />
    
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
 
@@ -49,7 +49,7 @@
           <a href="modules.html" title="Modules"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="invoque.html" title="Invocation"
+          <a href="invocation.html" title="Invocation"
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="index.html">pyextensions 0.1 documentation</a> &#187;</li> 
       </ul>
@@ -63,6 +63,19 @@
   <div class="section" id="motivation-for-pyextensions">
 <h1>Motivation for pyextensions<a class="headerlink" href="#motivation-for-pyextensions" title="Permalink to this headline">¶</a></h1>
 <p>Talk about my motivation, and Victor&#8217;s Stinner&#8217;s. Also mention Racket.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1">#ext repeat_keyword</span>
+
+<span class="k">def</span> <span class="nf">test_repeat</span><span class="p">():</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">repeat</span> <span class="mi">4</span><span class="p">:</span> 
+        <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">assert</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">5</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">test_repeat</span><span class="p">()</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Success.&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
 </div>
 
 
@@ -73,7 +86,7 @@
         <div class="sphinxsidebarwrapper"><h3>Related Topics</h3>
 <ul>
   <li><a href="index.html">Documentation index</a><ul>
-      <li>Previous: <a href="invoque.html" title="previous chapter">Invocation</a></li>
+      <li>Previous: <a href="invocation.html" title="previous chapter">Invocation</a></li>
       <li>Next: <a href="modules.html" title="next chapter">Modules</a></li>
   </ul></li>
 </ul>

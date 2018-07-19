@@ -58,23 +58,54 @@
             
   <div class="section" id="modules">
 <h1>Modules<a class="headerlink" href="#modules" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="module-pyextensions.import_hook">
-<span id="import-hook"></span><h2>import_hook<a class="headerlink" href="#module-pyextensions.import_hook" title="Permalink to this headline">¶</a></h2>
-<p>A custom importer making use of the import hook capability</p>
+<div class="section" id="module-pext2">
+<span id="pyextensions"></span><h2>pyextensions<a class="headerlink" href="#module-pext2" title="Permalink to this headline">¶</a></h2>
+<p>pyextensions is a proof-of-concept of implementing code transformations
+using import hooks. I believe that a module like pyextensions would be
+a nice addition to Python&#8217;s standard library.</p>
+<p>By code transformation, we mean that instead of executing the code found
+in a module <em>as is</em>, it is first transformed prior to its execution.
+The transformations are done by other modules, called transformers, which
+are normal Python file.</p>
+<p>A transformer needs to include at least one of the following:</p>
+<ol class="arabic simple">
+<li>a function named <code class="docutils literal"><span class="pre">transform_source()</span></code> which takes as its argument a string,
+like the content of a regular Python script, modifies it, and return another
+string.  Such transformations can be chained.</li>
+<li>a function named <code class="docutils literal"><span class="pre">transform_ast()</span></code> which takes as its argument an abstract
+syntax tree, modifies it, and returns another tree. Such transformations can
+also be chained.</li>
+</ol>
+<p>Ideally, a third type of transformations, identified by a function named
+<code class="docutils literal"><span class="pre">transform_bytecode()</span></code>, should be allowed; however, we have not been able
+so far to implement this.</p>
+<p>In addition to the above, we have found that some transformations would require
+that the module to be transformed and executed should also import some
+additional modules.  If a transformer needs this, it needs to include another
+function named <code class="docutils literal"><span class="pre">add_import</span></code>.</p>
+<p>Modules to be transformed should not have a &#8221;.py&#8221; extension. By default,
+this module looks for files ending with a &#8221;.notpy&#8221; extension; however, this
+can be changed as described below.</p>
 <dl class="class">
-<dt id="pyextensions.import_hook.ExtensionLoader">
-<em class="property">class </em><code class="descclassname">pyextensions.import_hook.</code><code class="descname">ExtensionLoader</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyextensions/import_hook.html#ExtensionLoader"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyextensions.import_hook.ExtensionLoader" title="Permalink to this definition">¶</a></dt>
-<dd><p>A custom loader which will transform the source prior to its execution</p>
+<dt id="pext2.ExtensionLoader">
+<em class="property">class </em><code class="descclassname">pext2.</code><code class="descname">ExtensionLoader</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pext2.html#ExtensionLoader"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pext2.ExtensionLoader" title="Permalink to this definition">¶</a></dt>
+<dd><p>A custom loader which transforms the source prior to its execution</p>
 <dl class="method">
-<dt id="pyextensions.import_hook.ExtensionLoader.exec_module">
-<code class="descname">exec_module</code><span class="sig-paren">(</span><em>module</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyextensions/import_hook.html#ExtensionLoader.exec_module"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyextensions.import_hook.ExtensionLoader.exec_module" title="Permalink to this definition">¶</a></dt>
-<dd><p>import the source code, transforma it before executing it so that
-it is known to Python.</p>
+<dt id="pext2.ExtensionLoader.exec_module">
+<code class="descname">exec_module</code><span class="sig-paren">(</span><em>module</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pext2.html#ExtensionLoader.exec_module"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pext2.ExtensionLoader.exec_module" title="Permalink to this definition">¶</a></dt>
+<dd><p>Import the source code, transforms it before executing it so that
+it becomes valid Python.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="pyextensions.import_hook.ExtensionLoader.write_html_diff">
-<code class="descname">write_html_diff</code><span class="sig-paren">(</span><em>name</em>, <em>original</em>, <em>transformed</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyextensions/import_hook.html#ExtensionLoader.write_html_diff"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyextensions.import_hook.ExtensionLoader.write_html_diff" title="Permalink to this definition">¶</a></dt>
+<dt id="pext2.ExtensionLoader.write_converted">
+<code class="descname">write_converted</code><span class="sig-paren">(</span><em>module_name</em>, <em>source</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pext2.html#ExtensionLoader.write_converted"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pext2.ExtensionLoader.write_converted" title="Permalink to this definition">¶</a></dt>
+<dd><p>Writes the converted source into a file.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pext2.ExtensionLoader.write_html_diff">
+<code class="descname">write_html_diff</code><span class="sig-paren">(</span><em>module_name</em>, <em>original</em>, <em>transformed</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pext2.html#ExtensionLoader.write_html_diff"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pext2.ExtensionLoader.write_html_diff" title="Permalink to this definition">¶</a></dt>
 <dd><p>Writes an html file showing the difference between the original
 and the transformed source.</p>
 </dd></dl>
@@ -82,169 +113,135 @@ and the transformed source.</p>
 </dd></dl>
 
 <dl class="class">
-<dt id="pyextensions.import_hook.ExtensionMetaFinder">
-<em class="property">class </em><code class="descclassname">pyextensions.import_hook.</code><code class="descname">ExtensionMetaFinder</code><a class="reference internal" href="_modules/pyextensions/import_hook.html#ExtensionMetaFinder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyextensions.import_hook.ExtensionMetaFinder" title="Permalink to this definition">¶</a></dt>
-<dd><p>A custom finder to locate modules.  The main reason for this code
-is to ensure that our custom loader, which does the code transformations,
-is used.</p>
+<dt id="pext2.ExtensionMetaFinder">
+<em class="property">class </em><code class="descclassname">pext2.</code><code class="descname">ExtensionMetaFinder</code><a class="reference internal" href="_modules/pext2.html#ExtensionMetaFinder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pext2.ExtensionMetaFinder" title="Permalink to this definition">¶</a></dt>
+<dd><p>A custom finder to locate modules, based on looking for files
+with a specific extension.</p>
 <dl class="method">
-<dt id="pyextensions.import_hook.ExtensionMetaFinder.find_spec">
-<code class="descname">find_spec</code><span class="sig-paren">(</span><em>fullname</em>, <em>path</em>, <em>target=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyextensions/import_hook.html#ExtensionMetaFinder.find_spec"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyextensions.import_hook.ExtensionMetaFinder.find_spec" title="Permalink to this definition">¶</a></dt>
-<dd><p>finds the appropriate properties (spec) of a module, and sets
+<dt id="pext2.ExtensionMetaFinder.find_spec">
+<code class="descname">find_spec</code><span class="sig-paren">(</span><em>fullname</em>, <em>path</em>, <em>target=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pext2.html#ExtensionMetaFinder.find_spec"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pext2.ExtensionMetaFinder.find_spec" title="Permalink to this definition">¶</a></dt>
+<dd><p>Finds the appropriate properties (spec) of a module, and sets
 its loader.</p>
 </dd></dl>
 
 </dd></dl>
 
 <dl class="function">
-<dt id="pyextensions.import_hook.import_main">
-<code class="descclassname">pyextensions.import_hook.</code><code class="descname">import_main</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyextensions/import_hook.html#import_main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyextensions.import_hook.import_main" title="Permalink to this definition">¶</a></dt>
-<dd><p>Imports the module that is to be interpreted as the main module.</p>
-<p>pyextensions is often invoked with a script meant to be run as the
-main module its source is transformed with the -s (or &#8211;source) option,
-as in:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">pyextensions</span> <span class="o">-</span><span class="n">s</span> <span class="n">name</span>
-</pre></div>
-</div>
-<p>Python identifies pyextensions as the main script; we artificially
-change this so that &#8220;main_script&#8221; is properly identified as <code class="docutils literal"><span class="pre">name</span></code>.</p>
-</dd></dl>
-
-</div>
-<div class="section" id="module-pyextensions.transforms">
-<span id="transforms"></span><h2>transforms<a class="headerlink" href="#module-pyextensions.transforms" title="Permalink to this headline">¶</a></h2>
-<p>This module takes care of identifying, importing and adding source
-code transformers. It also contains a function, <cite>transform</cite>, which
-takes care of invoking all known transformers to convert a source code.</p>
-<dl class="class">
-<dt id="pyextensions.transforms.NullTransformer">
-<em class="property">class </em><code class="descclassname">pyextensions.transforms.</code><code class="descname">NullTransformer</code><a class="reference internal" href="_modules/pyextensions/transforms.html#NullTransformer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyextensions.transforms.NullTransformer" title="Permalink to this definition">¶</a></dt>
-<dd><p>NullTransformer is a convenience class which can generate instances
-to be used when a given transformer cannot be imported.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="pyextensions.transforms.add_all_imports">
-<code class="descclassname">pyextensions.transforms.</code><code class="descname">add_all_imports</code><span class="sig-paren">(</span><em>source</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyextensions/transforms.html#add_all_imports"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyextensions.transforms.add_all_imports" title="Permalink to this definition">¶</a></dt>
+<dt id="pext2.add_all_imports">
+<code class="descclassname">pext2.</code><code class="descname">add_all_imports</code><span class="sig-paren">(</span><em>module_name</em>, <em>source</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pext2.html#add_all_imports"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pext2.add_all_imports" title="Permalink to this definition">¶</a></dt>
 <dd><p>Some transformers may require that other modules be imported
 in the source code for it to work properly.</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="pyextensions.transforms.add_transformers">
-<code class="descclassname">pyextensions.transforms.</code><code class="descname">add_transformers</code><span class="sig-paren">(</span><em>line</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyextensions/transforms.html#add_transformers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyextensions.transforms.add_transformers" title="Permalink to this definition">¶</a></dt>
-<dd><p>Extract the transformers names from a line of code of the form
-#ext transformer1 [transformer2]
-and adds them to the globally known dict</p>
+<dt id="pext2.apply_ast_transformations">
+<code class="descclassname">pext2.</code><code class="descname">apply_ast_transformations</code><span class="sig-paren">(</span><em>module_name</em>, <em>source</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pext2.html#apply_ast_transformations"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pext2.apply_ast_transformations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Used to convert the code by applying AST transformations,
+applying all the transformers specified in the module,
+in the order specified.</p>
+<p>AST transformers are applied on a abstract syntax tree.
+They are transformers that contain a function named
+<code class="docutils literal"><span class="pre">transform_ast</span></code> which take and abstract syntax tree as input
+and return a new tree.</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="pyextensions.transforms.apply_ast_transformations">
-<code class="descclassname">pyextensions.transforms.</code><code class="descname">apply_ast_transformations</code><span class="sig-paren">(</span><em>source</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyextensions/transforms.html#apply_ast_transformations"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyextensions.transforms.apply_ast_transformations" title="Permalink to this definition">¶</a></dt>
-<dd><p>Used to convert the source code into an AST tree and applying
-all AST transformer specified in the source code. It returns
-a (potentially transformed) AST tree.</p>
-<p>&#8220;AST transformers&#8221; are modules which must contain a function</p>
-<blockquote>
-<div>transform_ast(tree)</div></blockquote>
-<p>which return another AST tree.</p>
+<dt id="pext2.apply_source_transformations">
+<code class="descclassname">pext2.</code><code class="descname">apply_source_transformations</code><span class="sig-paren">(</span><em>module_name</em>, <em>source</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pext2.html#apply_source_transformations"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pext2.apply_source_transformations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Used to convert the source code, applying all the transformers
+specified in the module, in the order specified.</p>
+<p>Source transformers are transformers that contain a function named
+<code class="docutils literal"><span class="pre">transform_source</span></code>.</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="pyextensions.transforms.apply_source_transformations">
-<code class="descclassname">pyextensions.transforms.</code><code class="descname">apply_source_transformations</code><span class="sig-paren">(</span><em>source</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyextensions/transforms.html#apply_source_transformations"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyextensions.transforms.apply_source_transformations" title="Permalink to this definition">¶</a></dt>
-<dd><p>Used to convert the source code, making use of known transformers.</p>
-<p>&#8220;transformers&#8221; are modules which must contain a function</p>
-<blockquote>
-<div>transform_source(source)</div></blockquote>
-<p>which returns a tranformed source.
-Some transformers (for example, those found in the standard library
-module lib2to3) cannot cope with non-standard syntax; as a result, they
-may fail during a first attempt. We keep track of all failing
-transformers and keep retrying them until either they all succeeded
-or a fixed set of them fails twice in a row.</p>
+<dt id="pext2.create_fake_site_packages_dir">
+<code class="descclassname">pext2.</code><code class="descname">create_fake_site_packages_dir</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pext2.html#create_fake_site_packages_dir"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pext2.create_fake_site_packages_dir" title="Permalink to this definition">¶</a></dt>
+<dd><p>It is assumed that code transformers are third-party modules
+to be installed in a location from where they can be imported.
+For this proof of concept, we add a fake site-packages directory
+where the sample transformers will be located.</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="pyextensions.transforms.identify_requested_transformers">
-<code class="descclassname">pyextensions.transforms.</code><code class="descname">identify_requested_transformers</code><span class="sig-paren">(</span><em>source</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyextensions/transforms.html#identify_requested_transformers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyextensions.transforms.identify_requested_transformers" title="Permalink to this definition">¶</a></dt>
+<dt id="pext2.get_required_transformers">
+<code class="descclassname">pext2.</code><code class="descname">get_required_transformers</code><span class="sig-paren">(</span><em>module_name</em>, <em>source</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pext2.html#get_required_transformers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pext2.get_required_transformers" title="Permalink to this definition">¶</a></dt>
 <dd><p>Scan a source for lines of the form:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="c1">#ext transformer1 [transformer2 ...]</span>
 </pre></div>
 </div>
-<p>identifying transformers to be used and ensure that they are imported.</p>
+<p>identifying transformers to be used and ensure that they are imported
+in the order in which they are specifid in the file.</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="pyextensions.transforms.import_transformer">
-<code class="descclassname">pyextensions.transforms.</code><code class="descname">import_transformer</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyextensions/transforms.html#import_transformer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyextensions.transforms.import_transformer" title="Permalink to this definition">¶</a></dt>
-<dd><p>If needed, import a transformer, and adds it to the globally known dict
-The code inside a module where a transformer is defined should be
+<dt id="pext2.import_main">
+<code class="descclassname">pext2.</code><code class="descname">import_main</code><span class="sig-paren">(</span><em>module_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pext2.html#import_main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pext2.import_main" title="Permalink to this definition">¶</a></dt>
+<dd><p>Imports the module that is to be interpreted as the main module.</p>
+<p>pyextensions would normally be called with a script meant to be run as
+the main module with its source to be transformed.
+This script is specified the -s (or &#8211;source) option, as in:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">pyextensions</span> <span class="o">-</span><span class="n">s</span> <span class="n">name</span>
+</pre></div>
+</div>
+<p>With the -m flag, Python identifies pyextensions as the main script;
+we artificially change this so that &#8220;main_script&#8221; is properly
+identified as <code class="docutils literal"><span class="pre">name</span></code>.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pext2.import_transformer">
+<code class="descclassname">pext2.</code><code class="descname">import_transformer</code><span class="sig-paren">(</span><em>module_name</em>, <em>trans_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pext2.html#import_transformer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pext2.import_transformer" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function needed, import a transformer for a given module and
+appends it to the appropriate lists.</p>
+<p>The code inside a module where a transformer is defined should be
 standard Python code, which does not need any transformation.
 So, we disable the import hook, and let the normal module import
 do its job - which is faster and likely more reliable than our
 custom method.</p>
 </dd></dl>
 
-</div>
-<div class="section" id="module-pyextensions.console">
-<span id="console"></span><h2>console<a class="headerlink" href="#module-pyextensions.console" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="pyextensions.console.PyextensionsInteractiveConsole">
-<em class="property">class </em><code class="descclassname">pyextensions.console.</code><code class="descname">PyextensionsInteractiveConsole</code><span class="sig-paren">(</span><em>locals=None</em>, <em>show_python=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyextensions/console.html#PyextensionsInteractiveConsole"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyextensions.console.PyextensionsInteractiveConsole" title="Permalink to this definition">¶</a></dt>
-<dd><p>A Python console that tries to emulate the normal Python interpreter
-except that it support experimental code transformations.
-It inherits from cPython&#8217;s <code class="docutils literal"><span class="pre">code.InteractiveConsole</span></code>.</p>
-<p>Like the normal Python&#8217;s interactive console, it attempts to evaluate
-code entered one line at a time by a user.</p>
-<dl class="method">
-<dt id="pyextensions.console.PyextensionsInteractiveConsole.do_transformations">
-<code class="descname">do_transformations</code><span class="sig-paren">(</span><em>source</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyextensions/console.html#PyextensionsInteractiveConsole.do_transformations"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyextensions.console.PyextensionsInteractiveConsole.do_transformations" title="Permalink to this definition">¶</a></dt>
-<dd><p>Performs the source and AST transformations on the current content.</p>
-<p>Returns the transformed source.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="pyextensions.console.PyextensionsInteractiveConsole.fix_ending">
-<code class="descname">fix_ending</code><span class="sig-paren">(</span><em>source</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyextensions/console.html#PyextensionsInteractiveConsole.fix_ending"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyextensions.console.PyextensionsInteractiveConsole.fix_ending" title="Permalink to this definition">¶</a></dt>
-<dd><p>Ensures that the last blank lines of the transformed source are 
-consistent with what was provided by the user.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="pyextensions.console.PyextensionsInteractiveConsole.push">
-<code class="descname">push</code><span class="sig-paren">(</span><em>line</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyextensions/console.html#PyextensionsInteractiveConsole.push"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyextensions.console.PyextensionsInteractiveConsole.push" title="Permalink to this definition">¶</a></dt>
-<dd><p>Pushes a transformed line to the interpreter.</p>
-<p>The line should not have a trailing newline; it may have
-internal newlines.  The line is transformed and appended to a buffer.
-The interpreter&#8217;s runsource() method is called with the
-concatenated contents of the buffer as source.  If this
-indicates that the command was executed or invalid, the buffer
-is reset; otherwise, the command is incomplete, and the buffer
-is left as it was after the line was appended.  The return
-value is 1 if more input is required, 0 if the line was dealt
-with in some way (this is the same as runsource()).</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="pyextensions.console.PyextensionsInteractiveConsole.show_converted">
-<code class="descname">show_converted</code><span class="sig-paren">(</span><em>source</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyextensions/console.html#PyextensionsInteractiveConsole.show_converted"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyextensions.console.PyextensionsInteractiveConsole.show_converted" title="Permalink to this definition">¶</a></dt>
-<dd><p>Prints the converted source</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="pyextensions.console.PyextensionsInteractiveConsole.showsyntaxerror">
-<code class="descname">showsyntaxerror</code><span class="sig-paren">(</span><em>filename=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyextensions/console.html#PyextensionsInteractiveConsole.showsyntaxerror"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyextensions.console.PyextensionsInteractiveConsole.showsyntaxerror" title="Permalink to this definition">¶</a></dt>
-<dd><p>Shows the converted source if different than the original 
-and the syntax error</p>
-</dd></dl>
-
-</dd></dl>
-
 <dl class="function">
-<dt id="pyextensions.console.start_console">
-<code class="descclassname">pyextensions.console.</code><code class="descname">start_console</code><span class="sig-paren">(</span><em>local_vars=None</em>, <em>show_python=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyextensions/console.html#start_console"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyextensions.console.start_console" title="Permalink to this definition">¶</a></dt>
-<dd><p>Starts a console; modified from code.interact</p>
+<dt id="pext2.main">
+<code class="descclassname">pext2.</code><code class="descname">main</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pext2.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pext2.main" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Basic invocation</strong></p>
+<p>The primary role of pyextensions is to run programs that have a modified syntax.
+This is done by one of the following alternatives:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">pyextensions</span> <span class="o">-</span><span class="n">s</span> <span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">name</span>
+<span class="n">python</span> <span class="n">pyextensions</span><span class="o">.</span><span class="n">py</span> <span class="o">-</span><span class="n">s</span> <span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">name</span>
+<span class="ow">or</span> <span class="o">...</span>  <span class="o">--</span><span class="n">source</span> <span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">name</span>
+</pre></div>
+</div>
+<p>where <code class="docutils literal"><span class="pre">name</span></code> refers to a file named <code class="docutils literal"><span class="pre">name.notpy</span></code>. Any subsequent
+<code class="docutils literal"><span class="pre">import</span></code> statement will first look for file whose extension is <code class="docutils literal"><span class="pre">notpy</span></code>
+before looking for normal <code class="docutils literal"><span class="pre">py</span></code> or <code class="docutils literal"><span class="pre">pyc</span></code> files.
+Any file with the <code class="docutils literal"><span class="pre">notpy</span></code> extension that is imported will also be
+processed by the relevant source transformers.
+Normal Python files will bypass the transformations.</p>
+<p>A different extension that <code class="docutils literal"><span class="pre">notpy</span></code> can be specified as follows:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">pyextensions</span> <span class="o">-</span><span class="n">s</span> <span class="n">name</span> <span class="o">-</span><span class="n">x</span> <span class="n">EXTENSION</span>
+<span class="ow">or</span> <span class="o">--</span><span class="n">file_extension</span> <span class="n">EXTENSION</span>
+</pre></div>
+</div>
+<p>Note that you probaly should  not choose <code class="docutils literal"><span class="pre">py</span></code> and most definitely not
+<code class="docutils literal"><span class="pre">pyc</span></code> as the file extension for files to be processed by <code class="docutils literal"><span class="pre">pyextensions</span></code>.</p>
+<p><strong>Additional utilities</strong></p>
+<p>If you want to view how pyextensions transformed an input file,
+you can use the <code class="docutils literal"><span class="pre">-d</span></code> or <code class="docutils literal"><span class="pre">--diff</span></code> option:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">pyextensions</span> <span class="o">-</span><span class="n">s</span> <span class="n">name</span> <span class="o">-</span><span class="n">d</span>
+<span class="ow">or</span> <span class="o">...</span> <span class="n">name</span> <span class="o">--</span><span class="n">diff</span>
+</pre></div>
+</div>
+<p>This will use Python&#8217;s <code class="docutils literal"><span class="pre">difflib</span></code> module and write the result in a
+file named <code class="docutils literal"><span class="pre">name.notpy.html</span></code> in the current directory. The only changes
+that are source transformations, and not AST (or bytecode) transformations.</p>
+<div class="admonition-todo admonition" id="index-0">
+<p class="first admonition-title">Todo</p>
+<ul class="last simple">
+<li>document <code class="docutils literal"><span class="pre">-c</span></code> (<code class="docutils literal"><span class="pre">--convert</span></code>)</li>
+<li>Implement <code class="docutils literal"><span class="pre">-o</span></code> (<code class="docutils literal"><span class="pre">--output</span></code>)</li>
+</ul>
+</div>
 </dd></dl>
 
 </div>
@@ -255,6 +252,14 @@ available under the Tools directory. Because of its location,
 it is not available for import by Python programs and has been
 copied in the pyextensions repository since we use it for some
 AST transformations.</p>
+<p>We&#8217;ve added the following function:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">my_unparse</span><span class="p">(</span><span class="n">tree</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;quick and easy unparsing function&quot;&quot;&quot;</span>
+    <span class="n">v</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">()</span>
+    <span class="n">Unparser</span><span class="p">(</span><span class="n">tree</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">v</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">v</span><span class="o">.</span><span class="n">getvalue</span><span class="p">()</span>
+</pre></div>
+</div>
 <p>The original can be found at
 <a class="reference external" href="https://github.com/python/cpython/blob/master/Tools/parser/unparse.py">https://github.com/python/cpython/blob/master/Tools/parser/unparse.py</a></p>
 </div>
@@ -269,9 +274,7 @@ AST transformations.</p>
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Modules</a><ul>
-<li><a class="reference internal" href="#module-pyextensions.import_hook">import_hook</a></li>
-<li><a class="reference internal" href="#module-pyextensions.transforms">transforms</a></li>
-<li><a class="reference internal" href="#module-pyextensions.console">console</a></li>
+<li><a class="reference internal" href="#module-pext2">pyextensions</a></li>
 <li><a class="reference internal" href="#unparse">unparse</a></li>
 </ul>
 </li>

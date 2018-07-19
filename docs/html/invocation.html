@@ -62,98 +62,49 @@
             
   <div class="section" id="invocation">
 <h1>Invocation<a class="headerlink" href="#invocation" title="Permalink to this headline">¶</a></h1>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p>The content of this page was automatically extracted from the docstring
-of the module&#8217;s <code class="docutils literal"><span class="pre">__init__.py</span></code> and was possibly accurate at some point in the past.</p>
-<p class="last">Proceed with caution.</p>
-</div>
-<span class="target" id="module-pyextensions"></span><p>pyextensions sets up an import hook which
-makes it possible to run a file that contains modified Python syntax,
-provided the relevant source transformers can be imported.</p>
-<div class="admonition warning">
-<p class="first admonition-title">Warning</p>
-<p>It is always a good idea to not confirm that what follows below is
-still accurate. You can confirm this by running one of the following
-two alternatives:</p>
-<div class="last highlight-default"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">pyextensions</span> <span class="o">-</span><span class="n">h</span>
-<span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">pyextensions</span> <span class="o">--</span><span class="n">help</span>
-</pre></div>
-</div>
-</div>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">Every relevant flag specific to pyextensions has a short form and a
-long form. In what follows we always show both alternatives.</p>
-</div>
-<div class="section" id="basic-invocation">
-<h2>Basic invocation<a class="headerlink" href="#basic-invocation" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt>
+<code class="descclassname">pext2.</code><code class="descname">main</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pext2.html#main"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p><strong>Basic invocation</strong></p>
 <p>The primary role of pyextensions is to run programs that have a modified syntax.
-This is done by one of the two following alternatives:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">pyextensions</span> <span class="o">-</span><span class="n">s</span> <span class="n">name</span>
-<span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">pyextensions</span> <span class="o">--</span><span class="n">source</span> <span class="n">name</span>
+This is done by one of the following alternatives:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">pyextensions</span> <span class="o">-</span><span class="n">s</span> <span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">name</span>
+<span class="n">python</span> <span class="n">pyextensions</span><span class="o">.</span><span class="n">py</span> <span class="o">-</span><span class="n">s</span> <span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">name</span>
+<span class="ow">or</span> <span class="o">...</span>  <span class="o">--</span><span class="n">source</span> <span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">name</span>
 </pre></div>
 </div>
-<p>where <code class="docutils literal"><span class="pre">name</span></code> refers to a file named <code class="docutils literal"><span class="pre">name.notpy</span></code>.  Any subsequent
-<code class="docutils literal"><span class="pre">import</span></code> statement will first look for file whose extension is <code class="docutils literal"><span class="pre">notpy</span></code> before
-looking for normal <code class="docutils literal"><span class="pre">py</span></code> or <code class="docutils literal"><span class="pre">pyc</span></code> files. Any file with the <code class="docutils literal"><span class="pre">notpy</span></code> extension
-that is imported will also be processed by the relevant source transformers.
+<p>where <code class="docutils literal"><span class="pre">name</span></code> refers to a file named <code class="docutils literal"><span class="pre">name.notpy</span></code>. Any subsequent
+<code class="docutils literal"><span class="pre">import</span></code> statement will first look for file whose extension is <code class="docutils literal"><span class="pre">notpy</span></code>
+before looking for normal <code class="docutils literal"><span class="pre">py</span></code> or <code class="docutils literal"><span class="pre">pyc</span></code> files.
+Any file with the <code class="docutils literal"><span class="pre">notpy</span></code> extension that is imported will also be
+processed by the relevant source transformers.
 Normal Python files will bypass the transformations.</p>
 <p>A different extension that <code class="docutils literal"><span class="pre">notpy</span></code> can be specified as follows:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">pyextensions</span> <span class="o">-</span><span class="n">s</span> <span class="n">name</span> <span class="o">-</span><span class="n">x</span> <span class="n">EXTENSION</span>
-<span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">pyextensions</span> <span class="o">-</span><span class="n">s</span> <span class="n">name</span> <span class="o">--</span><span class="n">file_extension</span> <span class="n">EXTENSION</span>
+<span class="ow">or</span> <span class="o">--</span><span class="n">file_extension</span> <span class="n">EXTENSION</span>
 </pre></div>
 </div>
-<p>Note that you really should not choose &#8220;py&#8221; and most definitely not &#8220;pyc&#8221; 
-as the file extension for files to be processed by <code class="docutils literal"><span class="pre">pyextensions</span></code>.</p>
-</div>
-<div class="section" id="additional-utilities">
-<h2>Additional utilities<a class="headerlink" href="#additional-utilities" title="Permalink to this headline">¶</a></h2>
+<p>Note that you probaly should  not choose <code class="docutils literal"><span class="pre">py</span></code> and most definitely not
+<code class="docutils literal"><span class="pre">pyc</span></code> as the file extension for files to be processed by <code class="docutils literal"><span class="pre">pyextensions</span></code>.</p>
+<p><strong>Additional utilities</strong></p>
 <p>If you want to view how pyextensions transformed an input file,
 you can use the <code class="docutils literal"><span class="pre">-d</span></code> or <code class="docutils literal"><span class="pre">--diff</span></code> option:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">pyextensions</span> <span class="o">-</span><span class="n">s</span> <span class="n">name</span> <span class="o">-</span><span class="n">d</span>
-<span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">pyextensions</span> <span class="o">--</span><span class="n">source</span> <span class="n">name</span> <span class="o">--</span><span class="n">diff</span>
+<span class="ow">or</span> <span class="o">...</span> <span class="n">name</span> <span class="o">--</span><span class="n">diff</span>
 </pre></div>
 </div>
 <p>This will use Python&#8217;s <code class="docutils literal"><span class="pre">difflib</span></code> module and write the result in a
-file named <code class="docutils literal"><span class="pre">name.html</span></code> in the current directory.</p>
+file named <code class="docutils literal"><span class="pre">name.notpy.html</span></code> in the current directory. The only changes
+that are source transformations, and not AST (or bytecode) transformations.</p>
 <div class="admonition-todo admonition" id="index-0">
 <p class="first admonition-title">Todo</p>
 <ul class="last simple">
 <li>document <code class="docutils literal"><span class="pre">-c</span></code> (<code class="docutils literal"><span class="pre">--convert</span></code>)</li>
-<li>Implement <code class="docutils literal"><span class="pre">-o</span> <span class="pre">[filename]</span></code> (<code class="docutils literal"><span class="pre">--output</span></code>) and document</li>
+<li>Implement <code class="docutils literal"><span class="pre">-o</span></code> (<code class="docutils literal"><span class="pre">--output</span></code>)</li>
 </ul>
 </div>
-</div>
-<div class="section" id="quirky-console">
-<h2>Quirky console<a class="headerlink" href="#quirky-console" title="Permalink to this headline">¶</a></h2>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">Python&#8217;s interpreter console (REPL) is a useful tool for quick demos
-and code explorations. pyextensions includes a console which works
-reasonably well in most situations but can fail unexpectedly.
-To understand why, please console the documentation.</p>
-</div>
-<p>The simplest way to invoke pyextension&#8217;s console is as follows:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">pyextensions</span>
-</pre></div>
-</div>
-<div class="admonition-todo admonition" id="index-1">
-<p class="first admonition-title">Todo</p>
-<ul class="last simple">
-<li>document <code class="docutils literal"><span class="pre">-c</span></code> when using the console</li>
-<li>document <code class="docutils literal"><span class="pre">-d</span></code> when using the console</li>
-<li>document <code class="docutils literal"><span class="pre">-t</span></code> when using the console</li>
-</ul>
-</div>
-</div>
-<div class="section" id="python-s-interactive-mode">
-<h2>Python&#8217;s interactive mode<a class="headerlink" href="#python-s-interactive-mode" title="Permalink to this headline">¶</a></h2>
-<p>..todo:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Document</span> <span class="n">Python</span><span class="s1">&#39;s ``-i`` flag (interactive mode)</span>
-</pre></div>
-</div>
-</div>
+</dd></dl>
+
 </div>
 
 
@@ -161,18 +112,7 @@ To understand why, please console the documentation.</p>
         </div>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-  <h3><a href="index.html">Table Of Contents</a></h3>
-  <ul>
-<li><a class="reference internal" href="#">Invocation</a><ul>
-<li><a class="reference internal" href="#basic-invocation">Basic invocation</a></li>
-<li><a class="reference internal" href="#additional-utilities">Additional utilities</a></li>
-<li><a class="reference internal" href="#quirky-console">Quirky console</a></li>
-<li><a class="reference internal" href="#python-s-interactive-mode">Python&#8217;s interactive mode</a></li>
-</ul>
-</li>
-</ul>
-<h3>Related Topics</h3>
+        <div class="sphinxsidebarwrapper"><h3>Related Topics</h3>
 <ul>
   <li><a href="index.html">Documentation index</a><ul>
       <li>Previous: <a href="index.html" title="previous chapter">Pyextensions: making it easier to extend Python&#8217;s syntax</a></li>
