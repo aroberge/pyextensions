@@ -139,9 +139,9 @@ class ExtensionLoader(Loader):
         get_required_transformers(module_name, source)
 
         if TRANSFORMERS[module_name]:
-            source = apply_source_transformations(module_name, source)
+            source = apply_source_transformations(source)
             tree = ast.parse(source)
-            tree = apply_ast_transformations(module_name, tree)
+            tree = apply_ast_transformations(tree)
             co = compile(tree, module_name, "exec")
             exec(co, vars(module))
 
@@ -265,7 +265,7 @@ def apply_ast_transformations(module_name, tree):
        and return a new tree.
     """
     if module_name not in TRANSFORMERS:
-        return source
+        return tree
 
     for trans_name, transformer in TRANSFORMERS[module_name]:
         if hasattr(transformer, "transform_ast"):
