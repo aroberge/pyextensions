@@ -22,13 +22,13 @@ so far to implement this.
 
 In addition to the above, we have found that some transformations would require
 that the module to be transformed and executed should also import some
-additional modules.  While this could be done using the ``transform_source()``
+additional modules. While this could be done using the ``transform_source()``
 function to simply prepend the required imports in the transformed source,
 we have found it useful to do this using another function named ``add_import``.
 
 Modules to be transformed should not have a ".py" extension. By default,
 this module looks for files ending with a ".notpy" extension; however, this
-can be changed as described below.
+can be changed using a configuration variable.
 """
 import argparse
 import ast
@@ -58,19 +58,7 @@ def create_fake_site_packages_dir():
 
 create_fake_site_packages_dir()
 
-# The import hook utility provided by pyextensions can be used in
-# interactive mode, given a specifically crafted REPL.
-# Through experimentation, we have found that transformers need to behave
-# slightly differently depending on the context and thus need to be aware
-# of the context in which they are called.
-# CONFIG["interactive"] plays that role as a global variable,
-# accessible both to the REPL and the various transformers.
-CONFIG = {
-    "interactive": False,  # Not used explicitly in this module.
-    "file_ext": "notpy",
-    "main_module_name": None,
-    "version": 0.2,
-}
+CONFIG = {"file_ext": "notpy", "main_module_name": None, "version": 0.2}
 TRANSFORMERS = {"<cache>": []}  # [(tr_name1, tr_mod1), ...]
 
 
@@ -139,9 +127,10 @@ class ExtensionLoader(Loader):
         get_required_transformers(module_name, source)
 
         if TRANSFORMERS[module_name]:
-            source = apply_source_transformations(source)
+            source = add_all_imports(module_name, source)
+            source = apply_source_transformations(module_name, source)
             tree = ast.parse(source)
-            tree = apply_ast_transformations(tree)
+            tree = apply_ast_transformations(module_name, tree)
             co = compile(tree, module_name, "exec")
             exec(co, vars(module))
 
@@ -237,6 +226,25 @@ def import_transformer(module_name, trans_name):
 #
 # What follows is the code required for doing the actual transformations.
 ############
+
+
+def add_all_imports(module_name, source):
+    """Some transformers may require that other modules be imported
+    in the source code for it to work properly. While this could in principle
+    be done in transform_source(), we have found it useful to be done in
+    a separate function. In particular, this makes it possible to use the
+    import hook machinery of pyextensions in an REPL where the act of
+    importing additional modules is done once, separately from the act
+    of transforming the interactive input provided by a user.
+    """
+    if module_name not in TRANSFORMERS:
+        return source
+
+    for _, transformer in TRANSFORMERS[module_name]:
+        if hasattr(transformer, "add_import"):
+            source = transformer.add_import() + source
+    return source
+
 
 def apply_source_transformations(module_name, source):
     """Used to convert the source code, applying all the transformers
