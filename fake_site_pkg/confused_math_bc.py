@@ -27,7 +27,7 @@ def create_new_co(code_object):
     new_code = swap_add_mul(code_object.co_code)
     new_const = []
     for c in code_object.co_consts:
-        if hasattr(c, "co_code"):
+        if isinstance(c, CodeType):
             new_const.append(create_new_co(c))
         else:
             new_const.append(c)

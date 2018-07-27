@@ -62,32 +62,44 @@
 <div class="section" id="module-pyextensions">
 <span id="pyextensions"></span><h2>pyextensions<a class="headerlink" href="#module-pyextensions" title="Permalink to this headline">¶</a></h2>
 <p>pyextensions is a proof-of-concept of implementing code transformations
-using import hooks. I believe that a module like pyextensions would be
-a nice addition to Python&#8217;s standard library.</p>
+using import hooks.</p>
 <p>By code transformation, we mean that instead of executing the code found
 in a module <em>as is</em>, it is first transformed prior to its execution.
 The transformations are done by other modules, called transformers, which
 are normal Python file.</p>
 <p>A transformer needs to include at least one of the following:</p>
 <ol class="arabic simple">
-<li>a function named <code class="docutils literal"><span class="pre">transform_source()</span></code> which takes as its argument a string,
+<li>A function named <code class="docutils literal"><span class="pre">transform_source()</span></code> which takes as its argument a string,
 like the content of a regular Python script, modifies it, and return another
 string.  Such transformations can be chained.</li>
-<li>a function named <code class="docutils literal"><span class="pre">transform_ast()</span></code> which takes as its argument an abstract
+<li>A function named <code class="docutils literal"><span class="pre">transform_ast()</span></code> which takes as its argument an abstract
 syntax tree, modifies it, and returns another tree. Such transformations can
 also be chained.</li>
+<li>A function named <code class="docutils literal"><span class="pre">transform_bytecode()</span></code> which takes as its argument
+a code object, modifies it, and returns another code object. Such
+transformations can also be chained.</li>
 </ol>
-<p>Ideally, a third type of transformations, identified by a function named
-<code class="docutils literal"><span class="pre">transform_bytecode()</span></code>, should be allowed; however, we have not been able
-so far to implement this.</p>
-<p>In addition to the above, we have found that some transformations would require
-that the module to be transformed and executed should also import some
-additional modules. While this could be done using the <code class="docutils literal"><span class="pre">transform_source()</span></code>
-function to simply prepend the required imports in the transformed source,
-we have found it useful to do this using another function named <code class="docutils literal"><span class="pre">add_import</span></code>.</p>
-<p>Modules to be transformed should not have a &#8221;.py&#8221; extension. By default,
-this module looks for files ending with a &#8221;.notpy&#8221; extension; however, this
-can be changed using a configuration variable.</p>
+<p>In addition to the above, two other functions can be can potentially
+be used by pyextensions if they are found in a transformer:</p>
+<ol class="arabic simple">
+<li>By default, pyextension uses the <code class="docutils literal"><span class="pre">parse()</span></code> function from the ast module
+in the standard library to create an abstract syntax tree. If a
+transformer includes a similarly named function, it will be used instead.
+For example, one could use a parser that can handle cython notation,
+possibly converting all type information into a format acceptable
+for Python. Note that if such a function is found in more than one
+transformer, only the last one found will be used.</li>
+<li>If a transformation requires that some additional module needs to be
+imported by the transformed source, it should be using a function named
+<code class="docutils literal"><span class="pre">add_import()</span></code> which returns the appropriate import statements.
+While this could be done using the <code class="docutils literal"><span class="pre">transform_source()</span></code>
+function to simply prepend the required imports in the transformed
+source, it is more useful to do so in a separate function as it allows
+pyextensions to be used in other contexts &#8211; like
+in a custom REPL.</li>
+</ol>
+<p>By default, this module looks for files ending with a &#8221;.notpy&#8221; extension;
+however, this can be changed using a configuration settings.</p>
 <dl class="class">
 <dt id="pyextensions.ExtensionLoader">
 <em class="property">class </em><code class="descclassname">pyextensions.</code><code class="descname">ExtensionLoader</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyextensions.html#ExtensionLoader"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyextensions.ExtensionLoader" title="Permalink to this definition">¶</a></dt>
@@ -118,7 +130,8 @@ its loader.</p>
 <dl class="function">
 <dt id="pyextensions.add_all_imports">
 <code class="descclassname">pyextensions.</code><code class="descname">add_all_imports</code><span class="sig-paren">(</span><em>module_name</em>, <em>source</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyextensions.html#add_all_imports"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyextensions.add_all_imports" title="Permalink to this definition">¶</a></dt>
-<dd><p>Some transformers may require that other modules be imported
+<dd><p>Adds required import in transformed module.</p>
+<p>Some transformers may require that other modules be imported
 in the source code for it to work properly. While this could in principle
 be done in transform_source(), we have found it useful to be done in
 a separate function. In particular, this makes it possible to use the
@@ -130,22 +143,35 @@ of transforming the interactive input provided by a user.</p>
 <dl class="function">
 <dt id="pyextensions.apply_ast_transformations">
 <code class="descclassname">pyextensions.</code><code class="descname">apply_ast_transformations</code><span class="sig-paren">(</span><em>module_name</em>, <em>tree</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyextensions.html#apply_ast_transformations"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyextensions.apply_ast_transformations" title="Permalink to this definition">¶</a></dt>
-<dd><p>Used to convert the code by applying AST transformations,
-applying all the transformers specified in the module,
-in the order specified.</p>
+<dd><p>Converts the abstract source tree.</p>
+<p>Applies all the AST transformers specified in the module,
+in the order listed.</p>
 <p>AST transformers are applied on a abstract syntax tree.
 They are transformers that contain a function named
-<code class="docutils literal"><span class="pre">transform_ast</span></code> which take and abstract syntax tree as input
+<code class="docutils literal"><span class="pre">transform_ast</span></code> which take an abstract syntax tree as input
 and return a new tree.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyextensions.apply_bytecode_transformations">
+<code class="descclassname">pyextensions.</code><code class="descname">apply_bytecode_transformations</code><span class="sig-paren">(</span><em>module_name</em>, <em>code_object</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyextensions.html#apply_bytecode_transformations"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyextensions.apply_bytecode_transformations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts the bytecode</p>
+<p>Applies all the bytecode transformers specified in the module,
+in the order listed.
+Bytecode transformers are transformers that contain a function
+named <code class="docutils literal"><span class="pre">transform_bytecode</span></code> which take a code object as input
+and return a new code_object.</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="pyextensions.apply_source_transformations">
 <code class="descclassname">pyextensions.</code><code class="descname">apply_source_transformations</code><span class="sig-paren">(</span><em>module_name</em>, <em>source</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyextensions.html#apply_source_transformations"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyextensions.apply_source_transformations" title="Permalink to this definition">¶</a></dt>
-<dd><p>Used to convert the source code, applying all the transformers
-specified in the module, in the order specified.</p>
+<dd><p>Converts the source code.</p>
+<p>Applies all the source transformers specified in the module to be
+transformed, in the order listed.</p>
 <p>Source transformers are transformers that contain a function named
-<code class="docutils literal"><span class="pre">transform_source</span></code>.</p>
+<code class="docutils literal"><span class="pre">transform_source</span></code> which takes a string (source of a program)
+and returned a transformed string.</p>
 </dd></dl>
 
 <dl class="function">
@@ -155,6 +181,13 @@ specified in the module, in the order specified.</p>
 to be installed in a location from where they can be imported.
 For this proof of concept, we add a fake site-packages directory
 where the sample transformers will be located.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyextensions.get_parser">
+<code class="descclassname">pyextensions.</code><code class="descname">get_parser</code><span class="sig-paren">(</span><em>module_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyextensions.html#get_parser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyextensions.get_parser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Used to potentially substitute a different parser than the one provided
+in the ast module.</p>
 </dd></dl>
 
 <dl class="function">
@@ -188,18 +221,14 @@ identified as <code class="docutils literal"><span class="pre">name</span></code
 <code class="descclassname">pyextensions.</code><code class="descname">import_transformer</code><span class="sig-paren">(</span><em>module_name</em>, <em>trans_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyextensions.html#import_transformer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyextensions.import_transformer" title="Permalink to this definition">¶</a></dt>
 <dd><p>This function needed, import a transformer for a given module and
 appends it to the appropriate lists.</p>
-<p>The code inside a module where a transformer is defined should be
-standard Python code, which does not need any transformation.
-So, we disable the import hook, and let the normal module import
-do its job - which is faster and likely more reliable than our
-custom method.</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="pyextensions.main">
 <code class="descclassname">pyextensions.</code><code class="descname">main</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyextensions.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyextensions.main" title="Permalink to this definition">¶</a></dt>
 <dd><p><strong>Basic invocation</strong></p>
-<p>The primary role of pyextensions is to run programs that have a modified syntax.
+<p>The primary role of pyextensions is to run programs that have a
+modified syntax.
 This is done by one of the following alternatives:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">pyextensions</span> <span class="o">-</span><span class="n">s</span> <span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">name</span>
 <span class="n">python</span> <span class="n">pyextensions</span><span class="o">.</span><span class="n">py</span> <span class="o">-</span><span class="n">s</span> <span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">name</span>
@@ -207,14 +236,15 @@ This is done by one of the following alternatives:</p>
 </pre></div>
 </div>
 <p>where <code class="docutils literal"><span class="pre">name</span></code> refers to a file named <code class="docutils literal"><span class="pre">name.notpy</span></code>. Any subsequent
-<code class="docutils literal"><span class="pre">import</span></code> statement will first look for file whose extension is <code class="docutils literal"><span class="pre">notpy</span></code>
-before looking for normal <code class="docutils literal"><span class="pre">py</span></code> or <code class="docutils literal"><span class="pre">pyc</span></code> files.
+<code class="docutils literal"><span class="pre">import</span></code> statement will first look for file whose extension is
+<code class="docutils literal"><span class="pre">notpy</span></code> before looking for normal <code class="docutils literal"><span class="pre">py</span></code> or <code class="docutils literal"><span class="pre">pyc</span></code> files.
 Any file with the <code class="docutils literal"><span class="pre">notpy</span></code> extension that is imported will also be
 processed by the relevant source transformers.
 Normal Python files will bypass the transformations.</p>
-<p>A different extension that <code class="docutils literal"><span class="pre">notpy</span></code> can be specified as follows:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">pyextensions</span> <span class="o">-</span><span class="n">s</span> <span class="n">name</span> <span class="o">-</span><span class="n">x</span> <span class="n">EXTENSION</span>
-<span class="ow">or</span> <span class="o">--</span><span class="n">file_extension</span> <span class="n">EXTENSION</span>
+<p>Instead of the <code class="docutils literal"><span class="pre">notpy</span></code> default, different extensions can be
+specified as follows:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">pyextensions</span> <span class="o">-</span><span class="n">s</span> <span class="n">name</span> <span class="o">-</span><span class="n">x</span> <span class="n">EXTENSION</span> <span class="p">[</span><span class="n">EXTENSION_2</span> <span class="o">...</span><span class="p">]</span>
+<span class="ow">or</span> <span class="o">--</span><span class="n">file_extension</span> <span class="n">EXTENSION</span> <span class="p">[</span><span class="n">EXTENSION_2</span> <span class="o">...</span><span class="p">]</span>
 </pre></div>
 </div>
 </dd></dl>

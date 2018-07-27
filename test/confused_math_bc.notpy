@@ -27,4 +27,4 @@ def test_direct():
 if __name__ == "__main__":
     test_fns()
     test_direct()
-    print("success")
+    print("Success!")

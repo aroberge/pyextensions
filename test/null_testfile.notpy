@@ -1,4 +1,4 @@
-#ext null_ast null_source
+#ext null_ast null_source null_bytecode
 
 h = "hello"
 def test_null():
