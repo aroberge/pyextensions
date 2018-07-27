@@ -62,6 +62,7 @@ CONFIG = {"file_ext": "notpy", "main_module_name": None, "version": 0.2}
 TRANSFORMERS = {"<cache>": []}  # [(tr_name1, tr_mod1), ...]
 
 
+# The following has been adapted from https://stackoverflow.com/a/43573798/558799
 class ExtensionMetaFinder(MetaPathFinder):
     """A custom finder to locate modules, based on looking for files
        with a specific extension."""
@@ -93,7 +94,7 @@ class ExtensionMetaFinder(MetaPathFinder):
                 loader=ExtensionLoader(filename),
                 submodule_search_locations=submodule_locations,
             )
-        return None  # we don't know how to import this; default to others
+        return None  # default to other finders
 
 
 sys.meta_path.insert(0, ExtensionMetaFinder())
@@ -129,10 +130,14 @@ class ExtensionLoader(Loader):
         if TRANSFORMERS[module_name]:
             source = add_all_imports(module_name, source)
             source = apply_source_transformations(module_name, source)
-            tree = ast.parse(source)
+            parse = get_parser(module_name)
+            if parse is None:
+                parse = ast.parse
+            tree = parse(source)
             tree = apply_ast_transformations(module_name, tree)
-            co = compile(tree, module_name, "exec")
-            exec(co, vars(module))
+            code_object = compile(tree, module_name, "exec")
+            code_object = apply_bytecode_transformations(module_name, code_object)
+            exec(code_object, vars(module))
 
 
 def import_main(module_name):
@@ -262,6 +267,19 @@ def apply_source_transformations(module_name, source):
     return source
 
 
+def get_parser(module_name):
+    """Used to potentially substitute a different parser than the one provided
+    in the ast module.
+    """
+    if module_name not in TRANSFORMERS:
+        return None
+
+    for trans_name, transformer in TRANSFORMERS[module_name]:
+        if hasattr(transformer, "parse"):
+            return transformer.parse
+    return None
+
+
 def apply_ast_transformations(module_name, tree):
     """Used to convert the code by applying AST transformations,
        applying all the transformers specified in the module,
@@ -269,7 +287,7 @@ def apply_ast_transformations(module_name, tree):
 
        AST transformers are applied on a abstract syntax tree.
        They are transformers that contain a function named
-       ``transform_ast`` which take and abstract syntax tree as input
+       ``transform_ast`` which take an abstract syntax tree as input
        and return a new tree.
     """
     if module_name not in TRANSFORMERS:
@@ -279,6 +297,23 @@ def apply_ast_transformations(module_name, tree):
         if hasattr(transformer, "transform_ast"):
             tree = transformer.transform_ast(tree)
     return tree
+
+
+def apply_bytecode_transformations(module_name, code_object):
+    """Used to convert the bytecode
+
+       Bytecode transformers are applied on a code object.
+       They are transformers that contain a function named
+       ``transform_bytecode`` which take a code object as input
+       and return a new code_object.
+    """
+    if module_name not in TRANSFORMERS:
+        return code_object
+
+    for trans_name, transformer in TRANSFORMERS[module_name]:
+        if hasattr(transformer, "transform_bytecode"):
+            code_object = transformer.transform_bytecode(code_object)
+    return code_object
 
 
 def main():

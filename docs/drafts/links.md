@@ -26,7 +26,7 @@ Rejected PEP (by its author): https://www.python.org/dev/peps/pep-0511/
 
 Need to read https://mail.python.org/pipermail/python-ideas/2016-January/037892.html
 
-"I think something that isn't made clear in the rationale is why an import hook is good enough for most semantic extensions, but isn't good enough for global optimizers."  https://mail.python.org/pipermail/python-ideas/2016-January/037908.html 
+"I think something that isn't made clear in the rationale is why an import hook is good enough for most semantic extensions, but isn't good enough for global optimizers."  https://mail.python.org/pipermail/python-ideas/2016-January/037908.html
 
 https://mail.python.org/pipermail/python-ideas/2016-February/038450.html refers to where one might learn about implementing bytecodes.
 
@@ -99,6 +99,7 @@ https://mail.python.org/pipermail/python-ideas/2013-March/019727.html
 
 - about having an `__experimental__` package
 
+https://mail.python.org/pipermail/python-ideas/2016-January/037884.html
 
 https://mail.python.org/pipermail/python-ideas/2015-March/032817.html
 

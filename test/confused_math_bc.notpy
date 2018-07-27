@@ -1,0 +1,30 @@
+#ext confused_math_bc
+
+def add(a, b):
+    return a + b
+
+
+def mul(a, b):
+    return a * b
+
+def test_fns():
+    assert add(2, 3) == 6
+    assert mul(2, 3) == 5
+
+def test_direct():
+    a = 2
+    b = 3
+    c = 4
+
+    assert a + b == a * c   # 2 * 3 == 2 + 4
+
+    # operations on literals are performed before compilation
+    # and are thus unaffected by the bytecode transformation
+
+    assert 2 + 3 == 5
+    assert 2 * 3 == 6
+
+if __name__ == "__main__":
+    test_fns()
+    test_direct()
+    print("success")

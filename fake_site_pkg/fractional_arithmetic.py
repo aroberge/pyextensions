@@ -13,6 +13,7 @@
    """
 import ast
 
+
 class FractionWrapper(ast.NodeTransformer):
     """Wraps all integers in a call to Integer()"""
     def visit_Num(self, node):

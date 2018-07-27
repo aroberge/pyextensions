@@ -54,7 +54,6 @@ Quick links to topics
 .. toctree::
    :maxdepth: 2
 
-    Invocation <invocation>
     Motivation <motivation>
     Contents of various modules <modules>
 
