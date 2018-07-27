@@ -2,10 +2,20 @@
 
 Note: If code contains something like a + b, or a * b, where
 a and b are integer literals (e.g. 2 + 4), the operations are
-done prior to the creation of a code object and thus are"""
+done prior to the creation of a code object and thus are
+not captured by this transformation.
+
+Requires Python version >= 3.6 as it assumed that bytecode
+instructions are "wordcode" i.e. that instructions like
+BINARY_ADD and BINARY_MULTIPLY will fall on even-index values
+of the bytecode.
+"""
+import dis
+import sys
 
 from types import CodeType
-import dis
+
+assert sys.version_info >= (3, 6)
 
 ADD = dis.opmap['BINARY_ADD']
 MUL = dis.opmap['BINARY_MULTIPLY']
@@ -13,10 +23,10 @@ MUL = dis.opmap['BINARY_MULTIPLY']
 
 def swap_add_mul(bytecode):
     new_bc = []
-    for b in bytecode:
-        if b == ADD:
+    for i, b in enumerate(bytecode):
+        if b == ADD and i % 2 == 0:
             new_bc.append(MUL)
-        elif b == MUL:
+        elif b == MUL and i % 2 == 0:
             new_bc.append(ADD)
         else:
             new_bc.append(b)
@@ -52,5 +62,5 @@ def create_new_co(code_object):
 
 
 def transform_bytecode(code_object):
-    new_co = create_new_co(code_object)
-    return new_co
+    new_code_object = create_new_co(code_object)
+    return new_code_object
